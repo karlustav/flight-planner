@@ -2,6 +2,7 @@ package com.example.flight_planner.model;
 
 import java.time.LocalDateTime;
 
+
 public class Flight {
     private String id;
     private String from;

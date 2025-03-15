@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/flights")
+@RequestMapping("/api/flights")
+@CrossOrigin(origins="*")
 public class FlightController {
 
     private final FlightService flightService;
