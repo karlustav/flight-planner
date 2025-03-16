@@ -1,0 +1,396 @@
+//repository/SeatRepository.java
+package com.example.flight_planner.repository;
+
+import com.example.flight_planner.model.Seat;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+
+@Repository
+public interface SeatRepository extends JpaRepository<Seat, Long> {
+    List<Seat> findByFlightId(Long flightId);
+}
+
+//repository/FlightRepository.java
+package com.example.flight_planner.repository;
+
+import com.example.flight_planner.model.Flight;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+
+@Repository
+public interface FlightRepository extends JpaRepository<Flight, Long> {
+    List<Flight> findByOriginAndDestination(String origin, String destination);
+}
+
+//config/DataLoader.java
+package com.example.flight_planner.config;
+
+import com.example.flight_planner.model.Flight;
+import com.example.flight_planner.repository.FlightRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDateTime;
+
+@Component
+public class DataLoader implements CommandLineRunner {
+
+    @Autowired
+    private FlightRepository flightRepository;
+
+    @Override
+    public void run(String... args) throws Exception {
+        // Check if database is empty before adding new flights
+        if (flightRepository.count() == 0) {
+            Flight flight1 = new Flight("1", "New York", "Los Angeles", LocalDateTime.now().plusDays(3), 300);
+            Flight flight2 = new Flight("2", "London", "Paris", LocalDateTime.now().plusDays(5), 200);
+            Flight flight3 = new Flight("3", "Tokyo", "Seoul", LocalDateTime.now().plusDays(7), 400);
+
+            flightRepository.save(flight1);
+            flightRepository.save(flight2);
+            flightRepository.save(flight3);
+
+            System.out.println("Sample flight data added!");
+        }
+    }
+}
+
+//config/SwaggerConfig.java
+package com.example.flight_planner.config;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SwaggerConfig {
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Flight Planner API")
+                        .version("1.0")
+                        .description("API documentation for the Flight Planner application"));
+    }
+}
+
+//controller/SeatController.java
+package com.example.flight_planner.controller;
+
+import com.example.flight_planner.model.Seat;
+import com.example.flight_planner.service.SeatService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/seats")
+public class SeatController {
+    private final SeatService seatService;
+
+    public SeatController(SeatService seatService) {
+        this.seatService = seatService;
+    }
+
+    @GetMapping
+    public List<Seat> getAllSeats() {
+        return seatService.getAllSeats();
+    }
+
+    @GetMapping("/recommend")
+    public Seat recommendSeat(
+            @RequestParam(required = false, defaultValue = "false") boolean window,
+            @RequestParam(required = false, defaultValue = "false") boolean legroom,
+            @RequestParam(required = false, defaultValue = "false") boolean nearExit
+    ) {
+        return seatService.recommendSeat(window, legroom, nearExit);
+    }
+}
+
+//controller/HomeController.java
+package com.example.flight_planner.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class HomeController {
+    @GetMapping("/")
+    public String home() {
+        return "index"; // Otsib src/main/resources/templates/index.html
+    }
+}
+
+
+//controller/FlightController.java
+package com.example.flight_planner.controller;
+
+import com.example.flight_planner.model.Flight;
+import com.example.flight_planner.repository.FlightRepository;
+import com.example.flight_planner.service.FlightService;
+import org.springframework.ui.Model;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/flights")
+@CrossOrigin(origins="*")
+public class FlightController {
+
+    @Autowired
+    private FlightRepository flightRepository;
+
+    private final FlightService flightService;
+
+    public FlightController(FlightService flightService) {
+        this.flightService = flightService;
+    }
+
+    @GetMapping
+    public String listFlights(Model model) {
+        model.addAttribute("flights", flightRepository.findAll());
+        return "flights"; // flights.html
+    }
+}
+
+//model/Seat.java
+package com.example.flight_planner.model;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "seats")
+public class Seat {
+
+    @Id
+    private String seatNumber;  // Using seatNumber as the primary key
+
+    private boolean isAvailable;
+    private boolean isWindow;
+    private boolean hasExtraLegroom;
+    private boolean isNearExit;
+
+    // Default constructor for JPA
+    public Seat() {}
+
+    public Seat(String seatNumber, boolean isAvailable, boolean isWindow, boolean hasExtraLegroom, boolean isNearExit) {
+        this.seatNumber = seatNumber;
+        this.isAvailable = isAvailable;
+        this.isWindow = isWindow;
+        this.hasExtraLegroom = hasExtraLegroom;
+        this.isNearExit = isNearExit;
+    }
+
+    public String getSeatNumber() {
+        return seatNumber;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public boolean isWindow() {
+        return isWindow;
+    }
+
+    public boolean hasExtraLegroom() {
+        return hasExtraLegroom;
+    }
+
+    public boolean isNearExit() {
+        return isNearExit;
+    }
+    
+    // Optionally, add setters if needed
+}
+
+//model/Flight.java
+package com.example.flight_planner.model;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "flights")
+public class Flight {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String flightNumber;
+    private String from;
+    private String to;
+    private LocalDateTime departureTime;
+    private double price;
+
+    // Default constructor is required by JPA
+    public Flight() {}
+
+    // You can keep a constructor without id (id is generated)
+    public Flight(String flightNumber, String from, String to, LocalDateTime departureTime, double price) {
+        this.flightNumber = flightNumber;
+        this.from = from;
+        this.to = to;
+        this.departureTime = departureTime;
+        this.price = price;
+    }
+
+    // Getters and setters (including getId())
+    public Long getId() {
+        return id;
+    }
+
+    public String getFlightNumber() {
+        return flightNumber;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
+    public LocalDateTime getDepartureTime() {
+        return departureTime;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+    
+    // Optionally, add setters if needed
+}
+
+//service/FlightService.java
+package com.example.flight_planner.service;
+
+import com.example.flight_planner.model.Flight;
+import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class FlightService {
+    private final List<Flight> flights = new ArrayList<>();
+
+    public FlightService() {
+        // Lisame mõned testlennud
+        flights.add(new Flight("1", "Tallinn", "London", LocalDateTime.now().plusDays(1), 120.0));
+        flights.add(new Flight("2", "Tallinn", "New York", LocalDateTime.now().plusDays(2), 450.0));
+    }
+
+    public List<Flight> getAllFlights() {
+        return flights;
+    }
+}
+//service/SeatService.java
+package com.example.flight_planner.service;
+
+import com.example.flight_planner.model.Seat;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+@Service
+public class SeatService {
+    private List<Seat> seats = new ArrayList<>();
+    private Random random = new Random();
+
+    public SeatService() {
+        // Simuleerime 20 istekohta lennukis
+        for (int i = 1; i <= 20; i++) {
+            seats.add(new Seat(
+                    "A" + i, 
+                    random.nextBoolean(),  // Kas on vaba või mitte
+                    i % 6 == 1 || i % 6 == 0,  // Akna ääres
+                    i % 10 == 0,  // Rohkem jalaruumi iga 10. koht
+                    i <= 4  // Esimesed 4 kohta väljapääsu lähedal
+            ));
+        }
+    }
+
+    public List<Seat> getAllSeats() {
+        return seats;
+    }
+
+    public Seat recommendSeat(boolean window, boolean legroom, boolean nearExit) {
+        return seats.stream()
+                .filter(Seat::isAvailable)
+                .filter(s -> !window || s.isWindow())  // Kontrollib, kas soovitakse aknakohta
+                .filter(s -> !legroom || s.hasExtraLegroom())  // Kontrollib, kas soovitakse jalaruumi
+                .filter(s -> !nearExit || s.isNearExit())  // Kontrollib, kas soovitakse väljapääsu lähedale
+                .findFirst()
+                .orElse(null);
+    }
+}
+
+//FlightPlannerApplication.java
+package com.example.flight_planner;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class FlightPlannerApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(FlightPlannerApplication.class, args);
+	}
+
+}
+
+//print_project.sh
+#!/bin/zsh
+# This script writes each file in the current directory and its subdirectories
+# to an output file (default: project_debug.txt) in the following format:
+#
+# //relative/path/to/file
+# <file contents>
+#
+# The output is first written to a temporary file to avoid scanning it while the script runs.
+#
+# Usage:
+#   ./print_project.sh            # Writes to project_debug.txt
+#   ./print_project.sh output.txt   # Writes to output.txt
+
+# Use the first argument as output file or default to project_debug.txt.
+output_file="${1:-project_debug.txt}"
+
+# Create a temporary file (outside the project tree)
+temp_file=$(mktemp /tmp/project_debug.XXXXXX)
+echo "Writing output to temporary file: $temp_file"
+
+# Exclude the output file by name (assuming it's in the current directory)
+find . -type f ! -name "$(basename "$output_file")" -print0 | while IFS= read -r -d '' file; do
+    # Remove the leading "./" for a cleaner output.
+    relative="${file#./}"
+    {
+      echo "//${relative}"
+      cat "$file"
+      echo  # Blank line for separation.
+    } >> "$temp_file"
+done
+
+# Move the temporary file to the desired output file.
+mv "$temp_file" "$output_file"
+echo "Done! Output written to $output_file"
+
