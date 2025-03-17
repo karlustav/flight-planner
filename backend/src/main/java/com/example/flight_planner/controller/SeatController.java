@@ -8,7 +8,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/seats")
+@RequestMapping("/api/seats")
 public class SeatController {
     private final SeatService seatService;
 

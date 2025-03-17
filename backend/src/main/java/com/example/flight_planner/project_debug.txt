@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SeatRepository extends JpaRepository<Seat, Long> {
-    List<Seat> findByFlightId(Long flightId);
+public interface SeatRepository extends JpaRepository<Seat, String> {
+    // Removed: List<Seat> findByFlightId(Long flightId);
 }
 
 //repository/FlightRepository.java
@@ -24,39 +24,6 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
     List<Flight> findByOriginAndDestination(String origin, String destination);
 }
 
-//config/DataLoader.java
-package com.example.flight_planner.config;
-
-import com.example.flight_planner.model.Flight;
-import com.example.flight_planner.repository.FlightRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.LocalDateTime;
-
-@Component
-public class DataLoader implements CommandLineRunner {
-
-    @Autowired
-    private FlightRepository flightRepository;
-
-    @Override
-    public void run(String... args) throws Exception {
-        // Check if database is empty before adding new flights
-        if (flightRepository.count() == 0) {
-            Flight flight1 = new Flight("1", "New York", "Los Angeles", LocalDateTime.now().plusDays(3), 300);
-            Flight flight2 = new Flight("2", "London", "Paris", LocalDateTime.now().plusDays(5), 200);
-            Flight flight3 = new Flight("3", "Tokyo", "Seoul", LocalDateTime.now().plusDays(7), 400);
-
-            flightRepository.save(flight1);
-            flightRepository.save(flight2);
-            flightRepository.save(flight3);
-
-            System.out.println("Sample flight data added!");
-        }
-    }
-}
 
 //config/SwaggerConfig.java
 package com.example.flight_planner.config;
@@ -88,8 +55,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/seats")
+@RequestMapping("/api/seats")
 public class SeatController {
     private final SeatService seatService;
 
@@ -131,22 +99,15 @@ public class HomeController {
 package com.example.flight_planner.controller;
 
 import com.example.flight_planner.model.Flight;
-import com.example.flight_planner.repository.FlightRepository;
 import com.example.flight_planner.service.FlightService;
-import org.springframework.ui.Model;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/flights")
-@CrossOrigin(origins="*")
+@RequestMapping("/api/flights") // Ensure proper API structure
 public class FlightController {
-
-    @Autowired
-    private FlightRepository flightRepository;
-
+    
     private final FlightService flightService;
 
     public FlightController(FlightService flightService) {
@@ -154,9 +115,8 @@ public class FlightController {
     }
 
     @GetMapping
-    public String listFlights(Model model) {
-        model.addAttribute("flights", flightRepository.findAll());
-        return "flights"; // flights.html
+    public List<Flight> getAllFlights() {
+        return flightService.getAllFlights();
     }
 }
 
@@ -216,90 +176,97 @@ public class Seat {
 //model/Flight.java
 package com.example.flight_planner.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "flights")
 public class Flight {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String flightNumber;
-    private String from;
-    private String to;
+    private String origin;
+    private String destination;
     private LocalDateTime departureTime;
     private double price;
 
-    // Default constructor is required by JPA
+    // Default constructor (required for JPA)
     public Flight() {}
 
-    // You can keep a constructor without id (id is generated)
-    public Flight(String flightNumber, String from, String to, LocalDateTime departureTime, double price) {
-        this.flightNumber = flightNumber;
-        this.from = from;
-        this.to = to;
+    public Flight(String origin, String destination, LocalDateTime departureTime, double price) {
+        this.origin = origin;
+        this.destination = destination;
         this.departureTime = departureTime;
         this.price = price;
     }
 
-    // Getters and setters (including getId())
-    public Long getId() {
-        return id;
+    public Long getId() { return id; }
+    public String getOrigin() { return origin; }
+    public String getDestination() { return destination; }
+    public LocalDateTime getDepartureTime() { return departureTime; }
+    public double getPrice() { return price; }
+}
+
+//service/FlightDataLoader.java
+package com.example.flight_planner.service;
+
+import com.example.flight_planner.model.Flight;
+import com.example.flight_planner.repository.FlightRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Component
+public class FlightDataLoader implements CommandLineRunner {
+
+    private final FlightRepository flightRepository;
+
+    public FlightDataLoader(FlightRepository flightRepository) {
+        this.flightRepository = flightRepository;
     }
 
-    public String getFlightNumber() {
-        return flightNumber;
-    }
+    @Override
+    public void run(String... args) {
+        if (flightRepository.count() == 0) { // Only load data if the database is empty
+            List<Flight> sampleFlights = List.of(
+                new Flight("Tallinn", "London", LocalDateTime.now().plusDays(1), 120.0),
+                new Flight("Paris", "Berlin", LocalDateTime.now().plusDays(2), 95.5),
+                new Flight("New York", "Los Angeles", LocalDateTime.now().plusDays(3), 350.0),
+                new Flight("Tokyo", "Seoul", LocalDateTime.now().plusDays(4), 180.0)
+            );
 
-    public String getFrom() {
-        return from;
+            flightRepository.saveAll(sampleFlights);
+            System.out.println("Sample flight data loaded into the database.");
+        }
     }
-
-    public String getTo() {
-        return to;
-    }
-
-    public LocalDateTime getDepartureTime() {
-        return departureTime;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-    
-    // Optionally, add setters if needed
 }
 
 //service/FlightService.java
 package com.example.flight_planner.service;
 
 import com.example.flight_planner.model.Flight;
+import com.example.flight_planner.repository.FlightRepository;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Service
 public class FlightService {
-    private final List<Flight> flights = new ArrayList<>();
+    
+    private final FlightRepository flightRepository;
 
-    public FlightService() {
-        // Lisame mõned testlennud
-        flights.add(new Flight("1", "Tallinn", "London", LocalDateTime.now().plusDays(1), 120.0));
-        flights.add(new Flight("2", "Tallinn", "New York", LocalDateTime.now().plusDays(2), 450.0));
+    // Injecting the repository using constructor
+    public FlightService(FlightRepository flightRepository) {
+        this.flightRepository = flightRepository;
     }
 
     public List<Flight> getAllFlights() {
-        return flights;
+        return flightRepository.findAll(); // Ensure repository has `findAll()`
     }
 }
+
 //service/SeatService.java
 package com.example.flight_planner.service;
 

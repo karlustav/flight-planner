@@ -1,22 +1,22 @@
 package com.example.flight_planner.service;
 
 import com.example.flight_planner.model.Flight;
+import com.example.flight_planner.repository.FlightRepository;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Service
 public class FlightService {
-    private final List<Flight> flights = new ArrayList<>();
+    
+    private final FlightRepository flightRepository;
 
-    public FlightService() {
-        // Lisame mõned testlennud
-        flights.add(new Flight("1", "Tallinn", "London", LocalDateTime.now().plusDays(1), 120.0));
-        flights.add(new Flight("2", "Tallinn", "New York", LocalDateTime.now().plusDays(2), 450.0));
+    // Injecting the repository using constructor
+    public FlightService(FlightRepository flightRepository) {
+        this.flightRepository = flightRepository;
     }
 
     public List<Flight> getAllFlights() {
-        return flights;
+        return flightRepository.findAll(); // Ensure repository has `findAll()`
     }
 }
