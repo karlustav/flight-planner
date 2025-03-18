@@ -2,6 +2,7 @@ package com.example.flight_planner.model;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "seats")
@@ -13,7 +14,8 @@ public class Seat implements Serializable {
 
     @Column(nullable = false)
     private String seatNumber;  // Seat label (e.g., "A1")
-
+    
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY) // Many seats belong to one flight
     @JoinColumn(name = "flight_id", nullable = false)
     private Flight flight;
@@ -42,4 +44,9 @@ public class Seat implements Serializable {
     public boolean isWindow() { return isWindow; }
     public boolean hasExtraLegroom() { return hasExtraLegroom; }
     public boolean isNearExit() { return isNearExit; }
+
+    public void setFlight(Flight flight) {
+        this.flight = flight;
+    }
+    
 }
