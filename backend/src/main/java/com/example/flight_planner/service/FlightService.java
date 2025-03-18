@@ -5,18 +5,22 @@ import com.example.flight_planner.repository.FlightRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FlightService {
     
     private final FlightRepository flightRepository;
 
-    // Injecting the repository using constructor
     public FlightService(FlightRepository flightRepository) {
         this.flightRepository = flightRepository;
     }
 
     public List<Flight> getAllFlights() {
-        return flightRepository.findAll(); // Ensure repository has `findAll()`
+        return flightRepository.findAll();
+    }
+
+    public Flight getFlightById(Long id) {
+        return flightRepository.findById(id).orElse(null);
     }
 }

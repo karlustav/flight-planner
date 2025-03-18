@@ -1,40 +1,34 @@
 package com.example.flight_planner.service;
 
 import com.example.flight_planner.model.Seat;
+import com.example.flight_planner.repository.SeatRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
 
 @Service
 public class SeatService {
-    private List<Seat> seats = new ArrayList<>();
-    private Random random = new Random();
+    private final SeatRepository seatRepository;
 
-    public SeatService() {
-        // Simuleerime 20 istekohta lennukis
-        for (int i = 1; i <= 20; i++) {
-            seats.add(new Seat(
-                    "A" + i, 
-                    random.nextBoolean(),  // Kas on vaba või mitte
-                    i % 6 == 1 || i % 6 == 0,  // Akna ääres
-                    i % 10 == 0,  // Rohkem jalaruumi iga 10. koht
-                    i <= 4  // Esimesed 4 kohta väljapääsu lähedal
-            ));
-        }
+    public SeatService(SeatRepository seatRepository) {
+        this.seatRepository = seatRepository;
     }
 
     public List<Seat> getAllSeats() {
-        return seats;
+        return seatRepository.findAll();
+    }
+
+    public List<Seat> getSeatsByFlight(Long flightId) {
+        return seatRepository.findByFlightId(flightId);
     }
 
     public Seat recommendSeat(boolean window, boolean legroom, boolean nearExit) {
-        return seats.stream()
+        return seatRepository.findAll().stream()
                 .filter(Seat::isAvailable)
-                .filter(s -> !window || s.isWindow())  // Kontrollib, kas soovitakse aknakohta
-                .filter(s -> !legroom || s.hasExtraLegroom())  // Kontrollib, kas soovitakse jalaruumi
-                .filter(s -> !nearExit || s.isNearExit())  // Kontrollib, kas soovitakse väljapääsu lähedale
+                .filter(s -> !window || s.isWindow())  
+                .filter(s -> !legroom || s.hasExtraLegroom())  
+                .filter(s -> !nearExit || s.isNearExit())  
                 .findFirst()
                 .orElse(null);
     }

@@ -21,6 +21,11 @@ public class SeatController {
         return seatService.getAllSeats();
     }
 
+    @GetMapping("/flight/{flightId}") // NEW: Get seats by Flight ID
+    public List<Seat> getSeatsByFlight(@PathVariable Long flightId) {
+        return seatService.getSeatsByFlight(flightId);
+    }
+
     @GetMapping("/recommend")
     public Seat recommendSeat(
             @RequestParam(required = false, defaultValue = "false") boolean window,

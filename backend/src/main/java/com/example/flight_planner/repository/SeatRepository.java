@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SeatRepository extends JpaRepository<Seat, String> {
-    // Removed: List<Seat> findByFlightId(Long flightId);
+public interface SeatRepository extends JpaRepository<Seat, Long> { // Change to Long
+    List<Seat> findByFlightId(Long flightId); // Fetch seats for a specific flight
 }

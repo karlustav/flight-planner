@@ -104,8 +104,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/flights") // Ensure proper API structure
+@RequestMapping("/api/flights") 
 public class FlightController {
     
     private final FlightService flightService;
@@ -123,17 +124,24 @@ public class FlightController {
 //model/Seat.java
 package com.example.flight_planner.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "seats")
-public class Seat {
+public class Seat implements Serializable {
 
     @Id
-    private String seatNumber;  // Using seatNumber as the primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // Unique identifier for each seat entry
 
+    @Column(nullable = false)
+    private String seatNumber;  // Seat label (e.g., "A1")
+
+    @ManyToOne(fetch = FetchType.LAZY) // Many seats belong to one flight
+    @JoinColumn(name = "flight_id", nullable = false)
+    private Flight flight;
+    
     private boolean isAvailable;
     private boolean isWindow;
     private boolean hasExtraLegroom;
@@ -142,35 +150,22 @@ public class Seat {
     // Default constructor for JPA
     public Seat() {}
 
-    public Seat(String seatNumber, boolean isAvailable, boolean isWindow, boolean hasExtraLegroom, boolean isNearExit) {
+    public Seat(String seatNumber, Flight flight, boolean isAvailable, boolean isWindow, boolean hasExtraLegroom, boolean isNearExit) {
         this.seatNumber = seatNumber;
+        this.flight = flight;
         this.isAvailable = isAvailable;
         this.isWindow = isWindow;
         this.hasExtraLegroom = hasExtraLegroom;
         this.isNearExit = isNearExit;
     }
 
-    public String getSeatNumber() {
-        return seatNumber;
-    }
-
-    public boolean isAvailable() {
-        return isAvailable;
-    }
-
-    public boolean isWindow() {
-        return isWindow;
-    }
-
-    public boolean hasExtraLegroom() {
-        return hasExtraLegroom;
-    }
-
-    public boolean isNearExit() {
-        return isNearExit;
-    }
-    
-    // Optionally, add setters if needed
+    public Long getId() { return id; }
+    public String getSeatNumber() { return seatNumber; }
+    public Flight getFlight() { return flight; }
+    public boolean isAvailable() { return isAvailable; }
+    public boolean isWindow() { return isWindow; }
+    public boolean hasExtraLegroom() { return hasExtraLegroom; }
+    public boolean isNearExit() { return isNearExit; }
 }
 
 //model/Flight.java
@@ -178,6 +173,8 @@ package com.example.flight_planner.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Flight {
@@ -185,15 +182,21 @@ public class Flight {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String company;
     private String origin;
     private String destination;
     private LocalDateTime departureTime;
     private double price;
 
+    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Seat> seats = new ArrayList<>(); // Initialize to prevent NullPointerException
+
     // Default constructor (required for JPA)
     public Flight() {}
 
-    public Flight(String origin, String destination, LocalDateTime departureTime, double price) {
+    public Flight(String company, String origin, String destination, LocalDateTime departureTime, double price) {
+        this.company = company;
         this.origin = origin;
         this.destination = destination;
         this.departureTime = departureTime;
@@ -201,10 +204,17 @@ public class Flight {
     }
 
     public Long getId() { return id; }
+    public String getCompany() { return company; }
     public String getOrigin() { return origin; }
     public String getDestination() { return destination; }
     public LocalDateTime getDepartureTime() { return departureTime; }
     public double getPrice() { return price; }
+    public List<Seat> getSeats() { return seats; }
+
+    public void addSeat(Seat seat) {
+        seats.add(seat);
+        seat.setFlight(this); // Ensure the relationship is maintained
+    }
 }
 
 //service/FlightDataLoader.java
@@ -282,16 +292,20 @@ public class SeatService {
     private List<Seat> seats = new ArrayList<>();
     private Random random = new Random();
 
+    private String[] letters = {"A", "B", "C", "D", "E", "F"};
+
     public SeatService() {
         // Simuleerime 20 istekohta lennukis
         for (int i = 1; i <= 20; i++) {
-            seats.add(new Seat(
-                    "A" + i, 
+            for (String letter: letters) {
+                seats.add(new Seat(
+                    letter + i, 
                     random.nextBoolean(),  // Kas on vaba või mitte
-                    i % 6 == 1 || i % 6 == 0,  // Akna ääres
-                    i % 10 == 0,  // Rohkem jalaruumi iga 10. koht
-                    i <= 4  // Esimesed 4 kohta väljapääsu lähedal
+                    letter == "A" || letter == "F",  // Akna ääres
+                    i % 5 == 1,  // Rohkem jalaruumi read 1, 6, ...
+                    i <= 4 || i >= 16 // Esimesed 4 kohta väljapääsu lähedal
             ));
+            }
         }
     }
 
