@@ -1,79 +1,109 @@
-  
-.plane-background {
-    background: rgba(160, 209, 248, 0.2);  /* Light blue */
-    border-radius: 60px;
-    padding: 30px 20px;    /* Smaller padding */
-    margin: 0 auto;        /* Center horizontally */
-    max-width: 600px;      /* Shrink overall width */
+/* Modern Header Styling */
+header {
+    background: linear-gradient(to right, #1e3a8a, #2563eb);
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
-
-/* The container holding all rows */
-/* The container that holds all seat rows */
-#seatContainer {
+  
+  header nav ul {
+    list-style: none;
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-    max-width: 600px;      /* Keep seat layout narrower than the plane background */
-    margin: 0 auto;        /* Center horizontally inside .plane-background */
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
   }
   
+  header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  
+  header nav ul li a:hover,
+  header nav ul li a.active {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+  
+  /* Seats Layout (unchanged) */
+  .plane-background {
+      background: rgba(160, 209, 248, 0.2);  /* Light blue */
+      border-radius: 60px;
+      padding: 30px 20px;    /* Smaller padding */
+      margin: 0 auto;        /* Center horizontally */
+      max-width: 600px;      /* Shrink overall width */
+  }
+  
+  /* The container holding all rows */
+  #seatContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 600px;      /* Keep seat layout narrower than the plane background */
+      margin: 0 auto;        /* Center horizontally inside .plane-background */
+  }
+    
   /* Each row is a horizontal flex container */
   .seat-row {
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Center seats horizontally within the row */
-    gap: 20px;
-    flex-wrap: nowrap;       /* Prevent wrapping */
+      display: flex;
+      align-items: center;
+      justify-content: center; /* Center seats horizontally within the row */
+      gap: 20px;
+      flex-wrap: nowrap;       /* Prevent wrapping */
   }
-  
+    
   /* Left & right seat sections */
   .seat-section {
-    display: flex;
-    gap: 10px;
+      display: flex;
+      gap: 10px;
   }
-  
+    
   /* Aisle between seat sections */
   .aisle {
-    width: 30px;  /* empty space for aisle */
+      width: 30px;  /* empty space for aisle */
   }
-  
+    
   /* Seat styling */
   .seat {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #e0e0e0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.3s ease;
-    text-align: center;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e0e0e0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+      text-align: center;
   }
-  
+    
   .seat:hover {
-    background: #b3e5fc;
-    transform: translateY(-3px);
+      background: #b3e5fc;
+      transform: translateY(-3px);
   }
-  
+    
   .seat.available {
-    background: #8bc34a;
-    color: #fff;
+      background: #8bc34a;
+      color: #fff;
   }
-  
+    
   .seat.booked {
-    background: #e57373;
-    color: #fff;
-    cursor: not-allowed;
+      background: #e57373;
+      color: #fff;
+      cursor: not-allowed;
   }
-  
+    
   .seat.selected {
-    outline: 3px solid #ffc107;
+      outline: 3px solid #ffc107;
   }
-  
+    
   /* Extra spacing every 5 rows, if desired */
   .extra-gap {
-    margin-bottom: 30px;
+      margin-bottom: 30px;
   }
   

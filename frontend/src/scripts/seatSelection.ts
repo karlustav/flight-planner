@@ -1,7 +1,7 @@
 import { fetchSeatsByFlight } from "../api/seatsApi";
-import { fetchFlightById } from "../api/flightsApi";
+import { getFlightById } from "../api/flightsApi";
 
-// Get flight ID from URL
+// Get flight ID from URL (as a number)
 const urlParams = new URLSearchParams(window.location.search);
 const flightId = Number(urlParams.get("flightId"));
 
@@ -12,10 +12,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const flight = await fetchFlightById(flightId);
+    // Use the getFlightById function to fetch flight details
+    const flight = await getFlightById(flightId);
     document.getElementById("flightTitle")!.textContent = `Flight ${flight.id}: ${flight.origin} → ${flight.destination}`;
     document.getElementById("flightDetails")!.innerHTML = `Company: ${flight.company} <br> Price: $${flight.price}`;
 
+    // Fetch the seats for this flight and render them
     const seats = await fetchSeatsByFlight(flightId);
     renderSeats(seats);
   } catch (error) {
@@ -37,7 +39,7 @@ function renderSeats(seats: any[]) {
     rows[rowNum].push(seat);
   });
 
-  // Sort the row numbers
+  // Sort row numbers and render each row
   const sortedRowNumbers = Object.keys(rows)
     .map(Number)
     .sort((a, b) => a - b);
@@ -64,19 +66,19 @@ function renderSeats(seats: any[]) {
     const rowDiv = document.createElement("div");
     rowDiv.className = "seat-row";
 
-    // Add extra spacing every 5 rows (if the row number is divisible by 5)
+    // Optionally, add extra spacing every 5 rows
     if (rowNum % 5 === 0) {
       rowDiv.classList.add("extra-gap");
     }
 
-    // Left section container
+    // Create left section container
     const leftSection = document.createElement("div");
     leftSection.className = "seat-section left";
     leftSectionSeats.forEach(seat => {
       const seatButton = document.createElement("button");
       seatButton.textContent = seat.seatNumber;
-      seatButton.className = seat.isAvailable ? "seat available" : "seat booked";
-      seatButton.disabled = !seat.isAvailable;
+      seatButton.className = seat.available ? "seat available" : "seat booked";
+      seatButton.disabled = !seat.available;
       seatButton.addEventListener("click", () => {
         rowDiv.querySelectorAll(".seat.selected").forEach(el => el.classList.remove("selected"));
         seatButton.classList.add("selected");
@@ -84,14 +86,14 @@ function renderSeats(seats: any[]) {
       leftSection.appendChild(seatButton);
     });
 
-    // Right section container
+    // Create right section container
     const rightSection = document.createElement("div");
     rightSection.className = "seat-section right";
     rightSectionSeats.forEach(seat => {
       const seatButton = document.createElement("button");
       seatButton.textContent = seat.seatNumber;
-      seatButton.className = seat.isAvailable ? "seat available" : "seat booked";
-      seatButton.disabled = !seat.isAvailable;
+      seatButton.className = seat.available ? "seat available" : "seat booked";
+      seatButton.disabled = !seat.available;
       seatButton.addEventListener("click", () => {
         rowDiv.querySelectorAll(".seat.selected").forEach(el => el.classList.remove("selected"));
         seatButton.classList.add("selected");
@@ -99,7 +101,7 @@ function renderSeats(seats: any[]) {
       rightSection.appendChild(seatButton);
     });
 
-    // Create an aisle divider element
+    // Create an aisle divider
     const aisleDiv = document.createElement("div");
     aisleDiv.className = "aisle";
 

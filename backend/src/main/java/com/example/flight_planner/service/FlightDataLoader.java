@@ -35,15 +35,15 @@ public class FlightDataLoader implements CommandLineRunner {
             
             // Generate seats for each flight
             for (Flight flight : sampleFlights) {
-                for (int row = 1; row <= 10; row++) {
+                for (int row = 1; row <= 15; row++) {
                     for (char letter : new char[]{'A', 'B', 'C', 'D', 'E', 'F'}) {
                         seatRepository.save(new Seat(
                                 letter + String.valueOf(row),
                                 flight,
-                                true,
+                                Math.random() > 0.5,
                                 letter == 'A' || letter == 'F', // Window seat
                                 row % 5 == 1,  // Extra legroom
-                                row <= 2 || row >= 9 // Near exit
+                                row <= 2 || row >= 13 // Near exit
                         ));
                     }
                 }

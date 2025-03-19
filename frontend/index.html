@@ -1,13 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Flight Planner</title>
-    <link rel="stylesheet" href="styles/global.css">
+  <meta charset="UTF-8">
+  <title>Flight Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles/global.css">
 </head>
 <body>
-    <h1>Welcome to Flight Planner</h1>
-    <a href="flights.html">View Flights</a>
-    <script type="module" src="src/scripts/main.ts"></script>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="flights.html">Flights</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section class="hero">
+      <h1>Welcome to Flight Planner</h1>
+      <p>Plan your perfect flight with ease.</p>
+      <a href="flights.html" class="btn">View Flights</a>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2025 Flight Planner</p>
+  </footer>
+  <script type="module" src="src/scripts/main.ts"></script>
 </body>
 </html>

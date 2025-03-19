@@ -6,8 +6,8 @@ export async function fetchFlights() {
   return response.json();
 }
 
-// 🔴 Add this function:
-export async function fetchFlightById(flightId: number) {
+// You can either keep the name fetchFlightById or rename it to getFlightById.
+export async function getFlightById(flightId: number) {
   const response = await fetch(`${API_URL}/${flightId}`);
   if (!response.ok) throw new Error(`Failed to fetch flight with ID ${flightId}`);
   return response.json();

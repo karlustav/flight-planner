@@ -52,19 +52,51 @@ mv "$temp_file" "$output_file"
 echo "Done! Output written to $output_file"
 
 //flights.html
+<!-- flights.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Available Flights</title>
-    <link rel="stylesheet" href="styles/global.css">
+  <meta charset="UTF-8">
+  <title>Flights</title>
+  <!-- Use the path appropriate for your Vite setup -->
+  <link rel="stylesheet" href="/src/styles/main.css">
 </head>
 <body>
-    <h1>Available Flights</h1>
-    <ul id="flightsList"></ul>
-    
-    <a href="index.html">Back to Home</a>
-    <script type="module" src="src/scripts/flights.ts"></script>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="flights.html" class="active">Flights</a></li>
+        <li><a href="flight.html">Flight Details</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <h1>Flights</h1>
+    <div class="search-bar">
+      <input type="text" id="origin" placeholder="Origin">
+      <input type="text" id="destination" placeholder="Destination">
+      <input type="time" id="time">
+      <button id="search-btn">Search</button>
+    </div>
+    <div class="flights-list">
+      <table id="flightsTable">
+        <thead>
+          <tr>
+            <th>Flight</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Flight rows will be populated dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+  <!-- Import your TypeScript module (Vite will handle the transpilation) -->
+  <script type="module" src="/src/scripts/flights.ts"></script>
 </body>
 </html>
 
@@ -1127,14 +1159,19 @@ export default defineConfig({
     <meta charset="UTF-8">
     <title>Flight Details</title>
     <link rel="stylesheet" href="styles/global.css">
-    <link rel="stylesheet" href="styles/seats.css">
+    <!-- Updated path for seats.css -->
+    <link rel="stylesheet" href="src/styles/seats.css">
 </head>
 <body>
     <h1 id="flightTitle">Loading flight...</h1>
     <p id="flightDetails"></p>
+
+    
     
     <h2>Select a Seat</h2>
-    <div id="seatContainer"></div>
+    <div class="plane-background">
+        <div id="seatContainer"></div>
+    </div>
     <a href="flights.html">Back to Flights</a>
 
     <script type="module" src="src/scripts/seatSelection.ts"></script>
@@ -1142,7 +1179,181 @@ export default defineConfig({
 </html>
 
 //src/styles/seats.css
+  
+.plane-background {
+    background: rgba(160, 209, 248, 0.2);  /* Light blue */
+    border-radius: 60px;
+    padding: 30px 20px;    /* Smaller padding */
+    margin: 0 auto;        /* Center horizontally */
+    max-width: 600px;      /* Shrink overall width */
+  }
 
+/* The container holding all rows */
+/* The container that holds all seat rows */
+#seatContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 600px;      /* Keep seat layout narrower than the plane background */
+    margin: 0 auto;        /* Center horizontally inside .plane-background */
+  }
+  
+  /* Each row is a horizontal flex container */
+  .seat-row {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center seats horizontally within the row */
+    gap: 20px;
+    flex-wrap: nowrap;       /* Prevent wrapping */
+  }
+  
+  /* Left & right seat sections */
+  .seat-section {
+    display: flex;
+    gap: 10px;
+  }
+  
+  /* Aisle between seat sections */
+  .aisle {
+    width: 30px;  /* empty space for aisle */
+  }
+  
+  /* Seat styling */
+  .seat {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0e0e0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+    text-align: center;
+  }
+  
+  .seat:hover {
+    background: #b3e5fc;
+    transform: translateY(-3px);
+  }
+  
+  .seat.available {
+    background: #8bc34a;
+    color: #fff;
+  }
+  
+  .seat.booked {
+    background: #e57373;
+    color: #fff;
+    cursor: not-allowed;
+  }
+  
+  .seat.selected {
+    outline: 3px solid #ffc107;
+  }
+  
+  /* Extra spacing every 5 rows, if desired */
+  .extra-gap {
+    margin-bottom: 30px;
+  }
+  
+//src/styles/global.css
+/* src/styles/main.css */
+
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f4;
+    color: #333;
+  }
+  
+  /* Header & Navigation */
+  header {
+    background: #007BFF;
+    color: #fff;
+    padding: 10px 0;
+  }
+  
+  nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+  
+  nav ul li {
+    display: inline-block;
+    margin: 0 15px;
+  }
+  
+  nav ul li a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+  }
+  
+  nav ul li a.active,
+  nav ul li a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Main Content */
+  main {
+    padding: 20px;
+  }
+  
+  /* Search Bar */
+  .search-bar {
+    margin-bottom: 20px;
+  }
+  
+  .search-bar input[type="text"],
+  .search-bar input[type="time"] {
+    padding: 8px;
+    width: 200px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .search-bar button {
+    padding: 8px 12px;
+    border: none;
+    background: #007BFF;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .search-bar button:hover {
+    background: #0056b3;
+  }
+  
+  /* Flights Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  table thead {
+    background: #007BFF;
+    color: #fff;
+  }
+  
+  table th,
+  table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  table tr:nth-child(even) {
+    background: #f9f9f9;
+  }
+  
 //src/vite-env.d.ts
 /// <reference types="vite/client" />
 
@@ -1179,18 +1390,87 @@ function renderSeats(seats: any[]) {
   const container = document.getElementById("seatContainer")!;
   container.innerHTML = "";
 
+  // Group seats by row number (assuming seatNumber is in the format Letter + Number, e.g. "A1")
+  const rows: Record<number, any[]> = {};
   seats.forEach(seat => {
-    const button = document.createElement("button");
-    button.textContent = seat.seatNumber;
-    button.className = seat.isAvailable ? "seat available" : "seat booked";
-    button.disabled = !seat.isAvailable;
-    
-    button.addEventListener("click", () => {
-      document.querySelectorAll(".seat.selected").forEach(el => el.classList.remove("selected"));
-      button.classList.add("selected");
+    const rowNum = parseInt(seat.seatNumber.slice(1));
+    if (!rows[rowNum]) {
+      rows[rowNum] = [];
+    }
+    rows[rowNum].push(seat);
+  });
+
+  // Sort the row numbers
+  const sortedRowNumbers = Object.keys(rows)
+    .map(Number)
+    .sort((a, b) => a - b);
+
+  sortedRowNumbers.forEach(rowNum => {
+    const rowSeats = rows[rowNum];
+
+    // Sort seats in the row alphabetically by their letter
+    rowSeats.sort((a, b) => {
+      const letterA = a.seatNumber[0].toUpperCase();
+      const letterB = b.seatNumber[0].toUpperCase();
+      return letterA < letterB ? -1 : letterA > letterB ? 1 : 0;
     });
 
-    container.appendChild(button);
+    // Split into left (A, B, C) and right (D, E, F) sections
+    const leftSectionSeats = rowSeats.filter(seat =>
+      ["A", "B", "C"].includes(seat.seatNumber[0].toUpperCase())
+    );
+    const rightSectionSeats = rowSeats.filter(seat =>
+      ["D", "E", "F"].includes(seat.seatNumber[0].toUpperCase())
+    );
+
+    // Create a row container
+    const rowDiv = document.createElement("div");
+    rowDiv.className = "seat-row";
+
+    // Add extra spacing every 5 rows (if the row number is divisible by 5)
+    if (rowNum % 5 === 0) {
+      rowDiv.classList.add("extra-gap");
+    }
+
+    // Left section container
+    const leftSection = document.createElement("div");
+    leftSection.className = "seat-section left";
+    leftSectionSeats.forEach(seat => {
+      const seatButton = document.createElement("button");
+      seatButton.textContent = seat.seatNumber;
+      seatButton.className = seat.available ? "seat available" : "seat booked";
+      seatButton.disabled = !seat.available;
+      seatButton.addEventListener("click", () => {
+        rowDiv.querySelectorAll(".seat.selected").forEach(el => el.classList.remove("selected"));
+        seatButton.classList.add("selected");
+      });
+      leftSection.appendChild(seatButton);
+    });
+
+    // Right section container
+    const rightSection = document.createElement("div");
+    rightSection.className = "seat-section right";
+    rightSectionSeats.forEach(seat => {
+      const seatButton = document.createElement("button");
+      seatButton.textContent = seat.seatNumber;
+      seatButton.className = seat.available ? "seat available" : "seat booked";
+      seatButton.disabled = !seat.available;
+      seatButton.addEventListener("click", () => {
+        rowDiv.querySelectorAll(".seat.selected").forEach(el => el.classList.remove("selected"));
+        seatButton.classList.add("selected");
+      });
+      rightSection.appendChild(seatButton);
+    });
+
+    // Create an aisle divider element
+    const aisleDiv = document.createElement("div");
+    aisleDiv.className = "aisle";
+
+    // Assemble the row
+    rowDiv.appendChild(leftSection);
+    rowDiv.appendChild(aisleDiv);
+    rowDiv.appendChild(rightSection);
+    container.appendChild(rowDiv);
   });
 }
 
