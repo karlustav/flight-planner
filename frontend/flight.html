@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <title>Flight Details</title>
     <link rel="stylesheet" href="styles/global.css">
-    <link rel="stylesheet" href="styles/seats.css">
+    <!-- Updated path for seats.css -->
+    <link rel="stylesheet" href="src/styles/seats.css">
 </head>
 <body>
     <h1 id="flightTitle">Loading flight...</h1>
     <p id="flightDetails"></p>
+
+    
     
     <h2>Select a Seat</h2>
-    <div id="seatContainer"></div>
+    <div class="plane-background">
+        <div id="seatContainer"></div>
+    </div>
     <a href="flights.html">Back to Flights</a>
 
     <script type="module" src="src/scripts/seatSelection.ts"></script>

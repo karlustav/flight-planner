@@ -25,10 +25,10 @@ public class FlightDataLoader implements CommandLineRunner {
     public void run(String... args) {
         if (flightRepository.count() == 0) { // Only load if the database is empty
             List<Flight> sampleFlights = List.of(
-                new Flight("Airline1", "Tallinn", "London", LocalDateTime.now().plusDays(1), 120.0),
-                new Flight("Airline2", "Paris", "Berlin", LocalDateTime.now().plusDays(2), 95.5),
-                new Flight("Airline3", "New York", "Los Angeles", LocalDateTime.now().plusDays(3), 350.0),
-                new Flight("Airline4", "Tokyo", "Seoul", LocalDateTime.now().plusDays(4), 180.0)
+                new Flight("Finnair", "Tallinn", "London", LocalDateTime.now().plusDays(1), 120.0),
+                new Flight("Turkish Airlines", "Paris", "Berlin", LocalDateTime.now().plusDays(2), 95.5),
+                new Flight("Lufthansa", "New York", "Los Angeles", LocalDateTime.now().plusDays(3), 350.0),
+                new Flight("Ryanair", "Tokyo", "Seoul", LocalDateTime.now().plusDays(4), 180.0)
             );
 
             flightRepository.saveAll(sampleFlights);

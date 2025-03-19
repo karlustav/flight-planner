@@ -27,17 +27,86 @@ function renderSeats(seats: any[]) {
   const container = document.getElementById("seatContainer")!;
   container.innerHTML = "";
 
+  // Group seats by row number (assuming seatNumber is in the format Letter + Number, e.g. "A1")
+  const rows: Record<number, any[]> = {};
   seats.forEach(seat => {
-    const button = document.createElement("button");
-    button.textContent = seat.seatNumber;
-    button.className = seat.isAvailable ? "seat available" : "seat booked";
-    button.disabled = !seat.isAvailable;
-    
-    button.addEventListener("click", () => {
-      document.querySelectorAll(".seat.selected").forEach(el => el.classList.remove("selected"));
-      button.classList.add("selected");
+    const rowNum = parseInt(seat.seatNumber.slice(1));
+    if (!rows[rowNum]) {
+      rows[rowNum] = [];
+    }
+    rows[rowNum].push(seat);
+  });
+
+  // Sort the row numbers
+  const sortedRowNumbers = Object.keys(rows)
+    .map(Number)
+    .sort((a, b) => a - b);
+
+  sortedRowNumbers.forEach(rowNum => {
+    const rowSeats = rows[rowNum];
+
+    // Sort seats in the row alphabetically by their letter
+    rowSeats.sort((a, b) => {
+      const letterA = a.seatNumber[0].toUpperCase();
+      const letterB = b.seatNumber[0].toUpperCase();
+      return letterA < letterB ? -1 : letterA > letterB ? 1 : 0;
     });
 
-    container.appendChild(button);
+    // Split into left (A, B, C) and right (D, E, F) sections
+    const leftSectionSeats = rowSeats.filter(seat =>
+      ["A", "B", "C"].includes(seat.seatNumber[0].toUpperCase())
+    );
+    const rightSectionSeats = rowSeats.filter(seat =>
+      ["D", "E", "F"].includes(seat.seatNumber[0].toUpperCase())
+    );
+
+    // Create a row container
+    const rowDiv = document.createElement("div");
+    rowDiv.className = "seat-row";
+
+    // Add extra spacing every 5 rows (if the row number is divisible by 5)
+    if (rowNum % 5 === 0) {
+      rowDiv.classList.add("extra-gap");
+    }
+
+    // Left section container
+    const leftSection = document.createElement("div");
+    leftSection.className = "seat-section left";
+    leftSectionSeats.forEach(seat => {
+      const seatButton = document.createElement("button");
+      seatButton.textContent = seat.seatNumber;
+      seatButton.className = seat.isAvailable ? "seat available" : "seat booked";
+      seatButton.disabled = !seat.isAvailable;
+      seatButton.addEventListener("click", () => {
+        rowDiv.querySelectorAll(".seat.selected").forEach(el => el.classList.remove("selected"));
+        seatButton.classList.add("selected");
+      });
+      leftSection.appendChild(seatButton);
+    });
+
+    // Right section container
+    const rightSection = document.createElement("div");
+    rightSection.className = "seat-section right";
+    rightSectionSeats.forEach(seat => {
+      const seatButton = document.createElement("button");
+      seatButton.textContent = seat.seatNumber;
+      seatButton.className = seat.isAvailable ? "seat available" : "seat booked";
+      seatButton.disabled = !seat.isAvailable;
+      seatButton.addEventListener("click", () => {
+        rowDiv.querySelectorAll(".seat.selected").forEach(el => el.classList.remove("selected"));
+        seatButton.classList.add("selected");
+      });
+      rightSection.appendChild(seatButton);
+    });
+
+    // Create an aisle divider element
+    const aisleDiv = document.createElement("div");
+    aisleDiv.className = "aisle";
+
+    // Assemble the row
+    rowDiv.appendChild(leftSection);
+    rowDiv.appendChild(aisleDiv);
+    rowDiv.appendChild(rightSection);
+    container.appendChild(rowDiv);
   });
 }
