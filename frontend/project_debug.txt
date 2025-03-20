@@ -2,22 +2,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Flight Planner</title>
-    <link rel="stylesheet" href="styles/global.css">
+  <meta charset="UTF-8">
+  <title>Flight Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles/global.css">
 </head>
 <body>
-    <h1>Welcome to Flight Planner</h1>
-    <a href="flights.html">View Flights</a>
-    <script type="module" src="src/scripts/main.ts"></script>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="flights.html">Flights</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section class="hero">
+      <h1>Welcome to Flight Planner</h1>
+      <p>Plan your perfect flight with ease.</p>
+      <a href="flights.html" class="btn">View Flights</a>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2025 Flight Planner</p>
+  </footer>
+  <script type="module" src="src/scripts/main.ts"></script>
 </body>
 </html>
 
 //print_frontend.sh
 #!/bin/zsh
 # This script writes each file in the current directory and its subdirectories,
-# excluding the node_modules directory, to an output file (default: project_debug.txt)
-# in the following format:
+# excluding the node_modules directory and the src/images folder, to an output file 
+# (default: project_debug.txt) in the following format:
 #
 # //relative/path/to/file
 # <file contents>
@@ -35,8 +52,8 @@ output_file="${1:-project_debug.txt}"
 temp_file=$(mktemp /tmp/project_debug.XXXXXX)
 echo "Writing output to temporary file: $temp_file"
 
-# Exclude the output file by name and the node_modules directory
-find . -type d -name "node_modules" -prune -o \
+# Exclude the output file by name, the node_modules directory, and the src/images folder
+find . \( -type d -name "node_modules" -o -path "./src/images" \) -prune -o \
        -type f ! -name "$(basename "$output_file")" -print0 | while IFS= read -r -d '' file; do
     # Remove the leading "./" for a cleaner output.
     relative="${file#./}"
@@ -52,14 +69,13 @@ mv "$temp_file" "$output_file"
 echo "Done! Output written to $output_file"
 
 //flights.html
-<!-- flights.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Flights</title>
-  <!-- Use the path appropriate for your Vite setup -->
-  <link rel="stylesheet" href="/src/styles/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/styles/global.css">
 </head>
 <body>
   <header>
@@ -67,35 +83,39 @@ echo "Done! Output written to $output_file"
       <ul>
         <li><a href="index.html">Home</a></li>
         <li><a href="flights.html" class="active">Flights</a></li>
-        <li><a href="flight.html">Flight Details</a></li>
       </ul>
     </nav>
   </header>
   <main>
-    <h1>Flights</h1>
-    <div class="search-bar">
-      <input type="text" id="origin" placeholder="Origin">
-      <input type="text" id="destination" placeholder="Destination">
-      <input type="time" id="time">
-      <button id="search-btn">Search</button>
-    </div>
-    <div class="flights-list">
+    <section class="page-header">
+      <h1>Available Flights</h1>
+      <div class="search-bar">
+        <input type="text" id="origin" placeholder="Origin">
+        <input type="text" id="destination" placeholder="Destination">
+        <input type="time" id="time">
+        <button id="search-btn" class="btn">Search</button>
+      </div>
+    </section>
+    <section class="table-container">
       <table id="flightsTable">
         <thead>
           <tr>
-            <th>Flight</th>
+            <th>Company</th>
             <th>Origin</th>
             <th>Destination</th>
-            <th>Time</th>
+            <th>Price</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
           <!-- Flight rows will be populated dynamically -->
         </tbody>
       </table>
-    </div>
+    </section>
   </main>
-  <!-- Import your TypeScript module (Vite will handle the transpilation) -->
+  <footer>
+    <p>&copy; 2025 Flight Planner</p>
+  </footer>
   <script type="module" src="/src/scripts/flights.ts"></script>
 </body>
 </html>
@@ -1156,204 +1176,317 @@ export default defineConfig({
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Flight Details</title>
-    <link rel="stylesheet" href="styles/global.css">
-    <!-- Updated path for seats.css -->
-    <link rel="stylesheet" href="src/styles/seats.css">
+  <meta charset="UTF-8">
+  <title>Flight Details</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles/global.css">
+  <link rel="stylesheet" href="src/styles/seats.css">
 </head>
 <body>
-    <h1 id="flightTitle">Loading flight...</h1>
-    <p id="flightDetails"></p>
-
-    
-    
-    <h2>Select a Seat</h2>
-    <div class="plane-background">
+  <header>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="flights.html">Flights</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section class="flight-info">
+      <h1 id="flightTitle">Loading flight...</h1>
+      <p id="flightDetails"></p>
+    </section>
+    <section class="seat-selection">
+      <h2>Select a Seat</h2>
+      <div class="plane-background">
         <div id="seatContainer"></div>
-    </div>
-    <a href="flights.html">Back to Flights</a>
-
-    <script type="module" src="src/scripts/seatSelection.ts"></script>
+      </div>
+    </section>
+    <a href="flights.html" class="btn back-btn">Back to Flights</a>
+  </main>
+  <footer>
+    <p>&copy; 2025 Flight Planner</p>
+  </footer>
+  <script type="module" src="src/scripts/seatSelection.ts"></script>
 </body>
 </html>
 
 //src/styles/seats.css
-  
-.plane-background {
-    background: rgba(160, 209, 248, 0.2);  /* Light blue */
-    border-radius: 60px;
-    padding: 30px 20px;    /* Smaller padding */
-    margin: 0 auto;        /* Center horizontally */
-    max-width: 600px;      /* Shrink overall width */
+/* Modern Header Styling */
+header {
+    background: linear-gradient(to right, #1e3a8a, #2563eb);
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
-
-/* The container holding all rows */
-/* The container that holds all seat rows */
-#seatContainer {
+  
+  header nav ul {
+    list-style: none;
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-    max-width: 600px;      /* Keep seat layout narrower than the plane background */
-    margin: 0 auto;        /* Center horizontally inside .plane-background */
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
   }
   
+  header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  
+  header nav ul li a:hover,
+  header nav ul li a.active {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+  
+  /* Seats Layout (unchanged) */
+  .plane-background {
+      background: rgba(160, 209, 248, 0.2);  /* Light blue */
+      border-radius: 60px;
+      padding: 30px 20px;    /* Smaller padding */
+      margin: 0 auto;        /* Center horizontally */
+      max-width: 600px;      /* Shrink overall width */
+  }
+  
+  /* The container holding all rows */
+  #seatContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 600px;      /* Keep seat layout narrower than the plane background */
+      margin: 0 auto;        /* Center horizontally inside .plane-background */
+  }
+    
   /* Each row is a horizontal flex container */
   .seat-row {
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Center seats horizontally within the row */
-    gap: 20px;
-    flex-wrap: nowrap;       /* Prevent wrapping */
+      display: flex;
+      align-items: center;
+      justify-content: center; /* Center seats horizontally within the row */
+      gap: 20px;
+      flex-wrap: nowrap;       /* Prevent wrapping */
   }
-  
+    
   /* Left & right seat sections */
   .seat-section {
-    display: flex;
-    gap: 10px;
+      display: flex;
+      gap: 10px;
   }
-  
+    
   /* Aisle between seat sections */
   .aisle {
-    width: 30px;  /* empty space for aisle */
+      width: 30px;  /* empty space for aisle */
   }
-  
+    
   /* Seat styling */
   .seat {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #e0e0e0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.3s ease;
-    text-align: center;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e0e0e0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+      text-align: center;
   }
-  
+    
   .seat:hover {
-    background: #b3e5fc;
-    transform: translateY(-3px);
+      background: #b3e5fc;
+      transform: translateY(-3px);
   }
-  
+    
   .seat.available {
-    background: #8bc34a;
-    color: #fff;
+      background: #8bc34a;
+      color: #fff;
   }
-  
+    
   .seat.booked {
-    background: #e57373;
-    color: #fff;
-    cursor: not-allowed;
+      background: #e57373;
+      color: #fff;
+      cursor: not-allowed;
   }
-  
+    
   .seat.selected {
-    outline: 3px solid #ffc107;
+      outline: 3px solid #ffc107;
   }
-  
+    
   /* Extra spacing every 5 rows, if desired */
   .extra-gap {
-    margin-bottom: 30px;
+      margin-bottom: 30px;
   }
   
 //src/styles/global.css
-/* src/styles/main.css */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
-/* Global Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #f4f4f4;
-    color: #333;
-  }
-  
-  /* Header & Navigation */
-  header {
-    background: #007BFF;
-    color: #fff;
-    padding: 10px 0;
-  }
-  
-  nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-  }
-  
-  nav ul li {
-    display: inline-block;
-    margin: 0 15px;
-  }
-  
-  nav ul li a {
-    text-decoration: none;
-    color: #fff;
-    font-weight: bold;
-  }
-  
-  nav ul li a.active,
-  nav ul li a:hover {
-    text-decoration: underline;
-  }
-  
-  /* Main Content */
-  main {
-    padding: 20px;
-  }
-  
-  /* Search Bar */
-  .search-bar {
-    margin-bottom: 20px;
-  }
-  
-  .search-bar input[type="text"],
-  .search-bar input[type="time"] {
-    padding: 8px;
-    width: 200px;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .search-bar button {
-    padding: 8px 12px;
-    border: none;
-    background: #007BFF;
-    color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .search-bar button:hover {
-    background: #0056b3;
-  }
-  
-  /* Flights Table */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  table thead {
-    background: #007BFF;
-    color: #fff;
-  }
-  
-  table th,
-  table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  table tr:nth-child(even) {
-    background: #f9f9f9;
-  }
-  
+  font-family: 'Roboto', sans-serif;
+  background: #f9f9fb;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Header & Navigation */
+header {
+  background: #1e3a8a;
+  padding: 1rem 0;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+nav ul {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+}
+
+nav ul li {
+  margin: 0 1rem;
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+nav ul li a:hover,
+nav ul li a.active {
+  color: #ffcd38;
+}
+
+/* Main Content */
+main {
+  padding: 2rem;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 1rem 0;
+  background: #1e3a8a;
+  color: #fff;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+/* Hero Section (Index) */
+.hero {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+/* Button Styling */
+.btn {
+  display: inline-block;
+  background: #ffcd38;
+  color: #1e3a8a;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.btn:hover {
+  background: #ffc107;
+}
+
+/* Page Header (Flights) */
+.page-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.page-header h1 {
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+/* Search Bar */
+.search-bar {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.search-bar input[type="text"],
+.search-bar input[type="time"] {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 200px;
+}
+
+.search-bar button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: #1e3a8a;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.search-bar button:hover {
+  background: #163172;
+}
+
+/* Table Styles */
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+table th,
+table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+table thead {
+  background: #1e3a8a;
+  color: #fff;
+}
+
+table tr:nth-child(even) {
+  background: #f9f9fb;
+}
+
 //src/vite-env.d.ts
 /// <reference types="vite/client" />
 
@@ -1362,9 +1495,9 @@ console.log("Flight Planner Loaded");
 
 //src/scripts/seatSelection.ts
 import { fetchSeatsByFlight } from "../api/seatsApi";
-import { fetchFlightById } from "../api/flightsApi";
+import { getFlightById } from "../api/flightsApi";
 
-// Get flight ID from URL
+// Get flight ID from URL (as a number)
 const urlParams = new URLSearchParams(window.location.search);
 const flightId = Number(urlParams.get("flightId"));
 
@@ -1375,10 +1508,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const flight = await fetchFlightById(flightId);
+    // Use the getFlightById function to fetch flight details
+    const flight = await getFlightById(flightId);
     document.getElementById("flightTitle")!.textContent = `Flight ${flight.id}: ${flight.origin} → ${flight.destination}`;
     document.getElementById("flightDetails")!.innerHTML = `Company: ${flight.company} <br> Price: $${flight.price}`;
 
+    // Fetch the seats for this flight and render them
     const seats = await fetchSeatsByFlight(flightId);
     renderSeats(seats);
   } catch (error) {
@@ -1400,7 +1535,7 @@ function renderSeats(seats: any[]) {
     rows[rowNum].push(seat);
   });
 
-  // Sort the row numbers
+  // Sort row numbers and render each row
   const sortedRowNumbers = Object.keys(rows)
     .map(Number)
     .sort((a, b) => a - b);
@@ -1427,12 +1562,12 @@ function renderSeats(seats: any[]) {
     const rowDiv = document.createElement("div");
     rowDiv.className = "seat-row";
 
-    // Add extra spacing every 5 rows (if the row number is divisible by 5)
+    // Optionally, add extra spacing every 5 rows
     if (rowNum % 5 === 0) {
       rowDiv.classList.add("extra-gap");
     }
 
-    // Left section container
+    // Create left section container
     const leftSection = document.createElement("div");
     leftSection.className = "seat-section left";
     leftSectionSeats.forEach(seat => {
@@ -1447,7 +1582,7 @@ function renderSeats(seats: any[]) {
       leftSection.appendChild(seatButton);
     });
 
-    // Right section container
+    // Create right section container
     const rightSection = document.createElement("div");
     rightSection.className = "seat-section right";
     rightSectionSeats.forEach(seat => {
@@ -1462,7 +1597,7 @@ function renderSeats(seats: any[]) {
       rightSection.appendChild(seatButton);
     });
 
-    // Create an aisle divider element
+    // Create an aisle divider
     const aisleDiv = document.createElement("div");
     aisleDiv.className = "aisle";
 
@@ -1477,42 +1612,76 @@ function renderSeats(seats: any[]) {
 //src/scripts/flights.ts
 import { fetchFlights } from "../api/flightsApi";
 
-document.addEventListener("DOMContentLoaded", async () => {
-    const flightsList = document.getElementById("flightsList");
+interface Flight {
+  id: number;
+  company: string;
+  origin: string;
+  destination: string;
+  price: number;
+  time: string;
+}
 
-    if (!flightsList) {
-        console.error("❌ Flights list element not found in HTML.");
-        return;
+let allFlights: Flight[] = [];
+
+async function loadFlights() {
+  try {
+    allFlights = await fetchFlights();
+    renderFlights(allFlights);
+  } catch (error) {
+    console.error("Error fetching flights:", error);
+    const tbody = document.querySelector("#flightsTable tbody");
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="5" style="color:red;">Error loading flights. Check console.</td></tr>`;
     }
+  }
+}
 
-    try {
-        console.log("📡 Fetching flights from API...");
-        const flights = await fetchFlights();
-        console.log("✅ Flights received:", flights);
+function renderFlights(flights: Flight[]) {
+  const tbody = document.querySelector("#flightsTable tbody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (flights.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5">No flights available.</td></tr>`;
+    return;
+  }
+  flights.forEach(flight => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${flight.company}</td>
+      <td>${flight.origin}</td>
+      <td>${flight.destination}</td>
+      <td>$${flight.price}</td>
+      <td><a href="flight.html?flightId=${flight.id}">View Seats</a></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
 
-        if (!flights || flights.length === 0) {
-            console.warn("⚠️ No flights available.");
-            flightsList.innerHTML = "<li>No flights available.</li>";
-            return;
-        }
-
-        flightsList.innerHTML = ""; // Clear previous content
-
-        flights.forEach((flight: any) => {
-            console.log("✈️ Adding flight:", flight);
-            const li = document.createElement("li");
-            li.innerHTML = `
-                <strong>${flight.company}</strong>: ${flight.origin} → ${flight.destination} ($${flight.price})
-                <br>
-                <a href="flight.html?flightId=${flight.id}">View Seats</a>
-            `;
-            flightsList.appendChild(li);
-        });
-    } catch (error) {
-        console.error("❌ Error fetching flights:", error);
-        flightsList.innerHTML = `<li style="color: red;">Error loading flights. Check console.</li>`;
+function filterFlights() {
+  const originInput = (document.getElementById("origin") as HTMLInputElement).value.toLowerCase();
+  const destinationInput = (document.getElementById("destination") as HTMLInputElement).value.toLowerCase();
+  const timeInput = (document.getElementById("time") as HTMLInputElement).value;
+  
+  const filtered = allFlights.filter(flight => {
+    let matches = true;
+    if (originInput && !flight.origin.toLowerCase().includes(originInput)) {
+      matches = false;
     }
-});
+    if (destinationInput && !flight.destination.toLowerCase().includes(destinationInput)) {
+      matches = false;
+    }
+    // Here the time filter checks for an exact match. Adjust if needed.
+    if (timeInput && flight.time !== timeInput) {
+      matches = false;
+    }
+    return matches;
+  });
+  renderFlights(filtered);
+}
+
+document.getElementById("search-btn")?.addEventListener("click", filterFlights);
+
+document.addEventListener("DOMContentLoaded", loadFlights);
 
 //src/api/seatsApi.ts
 const API_URL = "http://localhost:8080/api/seats";
@@ -1532,8 +1701,8 @@ export async function fetchFlights() {
   return response.json();
 }
 
-// 🔴 Add this function:
-export async function fetchFlightById(flightId: number) {
+// You can either keep the name fetchFlightById or rename it to getFlightById.
+export async function getFlightById(flightId: number) {
   const response = await fetch(`${API_URL}/${flightId}`);
   if (!response.ok) throw new Error(`Failed to fetch flight with ID ${flightId}`);
   return response.json();
