@@ -3,6 +3,8 @@ package com.example.flight_planner.controller;
 import com.example.flight_planner.model.Seat;
 import com.example.flight_planner.service.SeatService;
 import org.springframework.web.bind.annotation.*;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import java.util.List;
 
@@ -28,10 +30,17 @@ public class SeatController {
 
     @GetMapping("/recommend")
     public Seat recommendSeat(
-            @RequestParam(required = false, defaultValue = "false") boolean window,
-            @RequestParam(required = false, defaultValue = "false") boolean legroom,
-            @RequestParam(required = false, defaultValue = "false") boolean nearExit
+            @RequestParam Long flightId,
+            @RequestParam(defaultValue="") String excluded,
+            @RequestParam(defaultValue="false") boolean window,
+            @RequestParam(defaultValue="false") boolean legroom,
+            @RequestParam(defaultValue="false") boolean nearExit
     ) {
-        return seatService.recommendSeat(window, legroom, nearExit);
+        List<String> excludedList = Arrays.stream(excluded.split(","))
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+        return seatService.recommendSeat(flightId, window, legroom, nearExit, excludedList);
     }
+    
+    
 }

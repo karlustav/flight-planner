@@ -92,6 +92,13 @@ function renderSeats(seats: any[]) {
 
 
 function toggleSeatSelection(seatNumber: string, button: HTMLElement) {
+  // If it was recommended, remove that blinking effect
+  if (button.classList.contains("recommended")) {
+    button.classList.remove("recommended");
+    const arrow = button.querySelector(".recommended-arrow");
+    if (arrow) arrow.remove();
+  }
+
   if (selectedSeats.has(seatNumber)) {
     selectedSeats.delete(seatNumber);
     button.classList.remove("selected");
@@ -101,6 +108,7 @@ function toggleSeatSelection(seatNumber: string, button: HTMLElement) {
   }
   updateTotalPrice();
 }
+
 
 function highlightRecommendedSeat(seatNumber: string) {
   // Query a seat that is both .seat.available and has data-seat-number="..."
@@ -123,17 +131,22 @@ function updateTotalPrice() {
 
 
 export async function getRecommendedSeat(options: {
+  flightId: number;
   window: boolean;
   legroom: boolean;
   nearExit: boolean;
+  // new parameter: a comma-separated list of already selected seat numbers
+  excluded: string;
 }): Promise<any> {
   const query = new URLSearchParams({
+    flightId: options.flightId.toString(),
     window: options.window.toString(),
     legroom: options.legroom.toString(),
     nearExit: options.nearExit.toString(),
+    excluded: options.excluded
   });
 
-  const response = await fetch(`http://localhost:8080/api/seats/recommend?${query.toString()}`);
+  const response = await fetch(`/api/seats/recommend?${query.toString()}`);
   if (!response.ok) {
     throw new Error("Failed to fetch recommended seat");
   }
@@ -141,23 +154,54 @@ export async function getRecommendedSeat(options: {
 }
 
 
+
+function clearRecommendedSeats() {
+  const recommended = document.querySelectorAll("button.seat.recommended");
+  recommended.forEach(btn => btn.classList.remove("recommended"));
+}
+
+
+// Mark a seat as recommended (blinking effect)
+function markSeatAsRecommended(seatNumber: string) {
+  // If the seat is offscreen, we’ll scroll to it (below)
+  const seatElement = document.querySelector(
+    `button.seat.available[data-seat-number="${seatNumber}"]`
+  ) as HTMLElement | null;
+
+  if (!seatElement) {
+    console.warn(`Recommended seat "${seatNumber}" not found or not available`);
+    return;
+  }
+
+  // Add the recommended class to start the blinking effect
+  seatElement.classList.add("recommended");
+
+  // Scroll into view so the user can see it
+  seatElement.scrollIntoView({ behavior: "smooth", block: "center" });
+
+}
+
 document.getElementById("recommend-seat-btn")!.addEventListener("click", async () => {
   try {
-    // 1. Read checkbox preferences (if applicable)
+    // Read checkbox preferences as before
     const windowPref = (document.getElementById("pref-window") as HTMLInputElement).checked;
     const legroomPref = (document.getElementById("pref-legroom") as HTMLInputElement).checked;
     const exitPref = (document.getElementById("pref-exit") as HTMLInputElement).checked;
 
-    // 2. Call your backend to get a recommended seat
+    // Create a comma-separated string of the already selected seat numbers
+    const excludedSeats = Array.from(selectedSeats).join(",");
+
+    // Call the backend, passing the excluded seats
     const recommendedSeat = await getRecommendedSeat({
+      flightId,
       window: windowPref,
       legroom: legroomPref,
-      nearExit: exitPref
+      nearExit: exitPref,
+      excluded: excludedSeats
     });
 
-    // 3. If a seat is returned, highlight it
     if (recommendedSeat && recommendedSeat.seatNumber) {
-      highlightRecommendedSeat(recommendedSeat.seatNumber);
+      markSeatAsRecommended(recommendedSeat.seatNumber);
     } else {
       console.warn("No recommended seat found");
     }
@@ -165,4 +209,6 @@ document.getElementById("recommend-seat-btn")!.addEventListener("click", async (
     console.error("Error recommending seat:", error);
   }
 });
+
+
 

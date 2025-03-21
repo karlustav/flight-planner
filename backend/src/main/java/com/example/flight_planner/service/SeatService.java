@@ -23,13 +23,23 @@ public class SeatService {
         return seatRepository.findByFlightId(flightId);
     }
 
-    public Seat recommendSeat(boolean window, boolean legroom, boolean nearExit) {
-        return seatRepository.findAll().stream()
-                .filter(Seat::isAvailable)
-                .filter(s -> !window || s.isWindow())  
-                .filter(s -> !legroom || s.hasExtraLegroom())  
-                .filter(s -> !nearExit || s.isNearExit())  
-                .findFirst()
-                .orElse(null);
-    }
+
+public Seat recommendSeat(Long flightId,
+    boolean window,
+    boolean legroom,
+    boolean nearExit,
+    List<String> excludedSeatNumbers) {
+        return seatRepository.findByFlightId(flightId).stream()
+        .filter(Seat::isAvailable)
+        .filter(s -> !excludedSeatNumbers.contains(s.getSeatNumber()))
+        .filter(s -> !window   || s.isWindow())
+        .filter(s -> !legroom || s.hasExtraLegroom())
+        .filter(s -> !nearExit || s.isNearExit())
+        .findFirst()
+        .orElse(null);
+}
+
+
+
+
 }

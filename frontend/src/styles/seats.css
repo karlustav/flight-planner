@@ -239,3 +239,17 @@ header nav ul li a.active {
 #recommend-seat-btn:hover {
     background: #ffc107;
 }
+
+@keyframes recommended-flash {
+    0%   { background-color: #8bc34a; } /* your .available color */
+    50%  { background-color: #ffc107; } /* your .selected color */
+    100% { background-color: #8bc34a; }
+  }
+  
+  .seat.recommended {
+    animation: recommended-flash 1s infinite; 
+    /* You could also set a border or box-shadow if you want more emphasis */
+    box-shadow: 0 0 5px #ffc107;
+  }
+  
+  
