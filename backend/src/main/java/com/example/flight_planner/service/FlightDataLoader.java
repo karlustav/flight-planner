@@ -54,7 +54,7 @@ public class FlightDataLoader implements CommandLineRunner {
                         seatRepository.save(new Seat(
                                 letter + String.valueOf(row),
                                 flight,
-                                Math.random() > takenAmount,
+                                Math.random() > takenAmount, // 30% to 70% of seats are taken already
                                 letter == 'A' || letter == 'F', // Window seat
                                 row % 5 == 1,  // Extra legroom
                                 row <= 2 || row >= 13 // Near exit

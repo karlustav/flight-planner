@@ -53,12 +53,15 @@ import com.example.flight_planner.model.Seat;
 import com.example.flight_planner.service.SeatService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/seats")
 public class SeatController {
+
     private final SeatService seatService;
 
     public SeatController(SeatService seatService) {
@@ -70,18 +73,38 @@ public class SeatController {
         return seatService.getAllSeats();
     }
 
-    @GetMapping("/flight/{flightId}") // NEW: Get seats by Flight ID
+    @GetMapping("/flight/{flightId}")
     public List<Seat> getSeatsByFlight(@PathVariable Long flightId) {
         return seatService.getSeatsByFlight(flightId);
     }
 
+    /**
+     * Returns a list of recommended seats. If passengerCount == 1,
+     * we filter by window/legroom/nearExit. If passengerCount > 1,
+     * we ignore those preferences and look for adjacent seats in the same row.
+     */
     @GetMapping("/recommend")
-    public Seat recommendSeat(
-            @RequestParam(required = false, defaultValue = "false") boolean window,
-            @RequestParam(required = false, defaultValue = "false") boolean legroom,
-            @RequestParam(required = false, defaultValue = "false") boolean nearExit
+    public List<Seat> recommendSeats(
+            @RequestParam Long flightId,
+            @RequestParam(defaultValue = "1") int passengerCount,
+            @RequestParam(defaultValue = "") String excluded,
+            @RequestParam(defaultValue = "false") boolean window,
+            @RequestParam(defaultValue = "false") boolean legroom,
+            @RequestParam(defaultValue = "false") boolean nearExit
     ) {
-        return seatService.recommendSeat(window, legroom, nearExit);
+        // Convert comma-separated string of excluded seats into a list
+        List<String> excludedList = Arrays.stream(excluded.split(","))
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+
+        return seatService.recommendSeats(
+                flightId,
+                passengerCount,
+                excludedList,
+                window,
+                legroom,
+                nearExit
+        );
     }
 }
 
@@ -136,6 +159,7 @@ package com.example.flight_planner.model;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "seats")
@@ -147,7 +171,8 @@ public class Seat implements Serializable {
 
     @Column(nullable = false)
     private String seatNumber;  // Seat label (e.g., "A1")
-
+    
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY) // Many seats belong to one flight
     @JoinColumn(name = "flight_id", nullable = false)
     private Flight flight;
@@ -176,6 +201,11 @@ public class Seat implements Serializable {
     public boolean isWindow() { return isWindow; }
     public boolean hasExtraLegroom() { return hasExtraLegroom; }
     public boolean isNearExit() { return isNearExit; }
+
+    public void setFlight(Flight flight) {
+        this.flight = flight;
+    }
+    
 }
 
 //model/Flight.java
@@ -239,12 +269,14 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 
 @Component
 public class FlightDataLoader implements CommandLineRunner {
 
     private final FlightRepository flightRepository;
     private final SeatRepository seatRepository;
+    private final Random random = new Random(); // Create a Random instance
 
     public FlightDataLoader(FlightRepository flightRepository, SeatRepository seatRepository) {
         this.flightRepository = flightRepository;
@@ -255,31 +287,57 @@ public class FlightDataLoader implements CommandLineRunner {
     public void run(String... args) {
         if (flightRepository.count() == 0) { // Only load if the database is empty
             List<Flight> sampleFlights = List.of(
-                new Flight("Airline1", "Tallinn", "London", LocalDateTime.now().plusDays(1), 120.0),
-                new Flight("Airline2", "Paris", "Berlin", LocalDateTime.now().plusDays(2), 95.5),
-                new Flight("Airline3", "New York", "Los Angeles", LocalDateTime.now().plusDays(3), 350.0),
-                new Flight("Airline4", "Tokyo", "Seoul", LocalDateTime.now().plusDays(4), 180.0)
+                new Flight("Finnair", "Tallinn", "London", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Turkish Airlines", "Paris", "Berlin", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Lufthansa", "New York", "Los Angeles", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Ryanair", "Tokyo", "Seoul", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Ryanair", "Tallinn", "Helsinki", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Lufthansa", "Tallinn", "Sydney", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Finnair", "Tallinn", "Tokyo", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Ryanair", "Tallinn", "Stockholm", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Turkish Airlines", "Tallinn", "Dubai", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Finnair", "Tallinn", "New York", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Lufthansa", "Tallinn", "Madrid", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Turkish Airlines", "Tallinn", "Los Angeles", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Ryanair", "Tallinn", "London", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Finnair", "Tallinn", "Berlin", generateRandomDate(), Math.round(Math.random() * 400 + 50)),
+                new Flight("Lufthansa", "Tallinn", "Seoul", generateRandomDate(), Math.round(Math.random() * 400 + 50))
             );
 
             flightRepository.saveAll(sampleFlights);
             
             // Generate seats for each flight
             for (Flight flight : sampleFlights) {
-                for (int row = 1; row <= 10; row++) {
+                double takenAmount = Math.random() * 0.4 + 0.3;
+                for (int row = 1; row <= 15; row++) {
                     for (char letter : new char[]{'A', 'B', 'C', 'D', 'E', 'F'}) {
                         seatRepository.save(new Seat(
                                 letter + String.valueOf(row),
                                 flight,
-                                true,
+                                Math.random() > takenAmount, // 30% to 70% of seats are taken already
                                 letter == 'A' || letter == 'F', // Window seat
                                 row % 5 == 1,  // Extra legroom
-                                row <= 2 || row >= 9 // Near exit
+                                row <= 2 || row >= 13 // Near exit
                         ));
                     }
                 }
             }
             System.out.println("Sample flight data and seats loaded.");
         }
+    }
+
+    // Generate a random departure date within the next 2 months at a random half-hour time
+    private LocalDateTime generateRandomDate() {
+        int daysToAdd = random.nextInt(60) + 1; // Random number of days (1-60)
+        int hour = random.nextInt(24); // Random hour (0-23)
+        int minute = random.nextBoolean() ? 0 : 30; // Either 00 or 30 minutes
+
+        return LocalDateTime.now()
+                .plusDays(daysToAdd)
+                .withHour(hour)
+                .withMinute(minute)
+                .withSecond(0)
+                .withNano(0);
     }
 }
 
@@ -318,11 +376,12 @@ import com.example.flight_planner.model.Seat;
 import com.example.flight_planner.repository.SeatRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SeatService {
+
     private final SeatRepository seatRepository;
 
     public SeatService(SeatRepository seatRepository) {
@@ -337,14 +396,79 @@ public class SeatService {
         return seatRepository.findByFlightId(flightId);
     }
 
-    public Seat recommendSeat(boolean window, boolean legroom, boolean nearExit) {
-        return seatRepository.findAll().stream()
+    /**
+     * If passengerCount == 1, apply preferences.
+     * If passengerCount > 1, ignore preferences and find a block of adjacent seats.
+     * 
+     * "Adjacent" here means same row with consecutive letters (e.g., A1, B1).
+     */
+    public List<Seat> recommendSeats(Long flightId,
+                                     int passengerCount,
+                                     List<String> excludedSeatNumbers,
+                                     boolean window,
+                                     boolean legroom,
+                                     boolean nearExit) {
+
+        // 1) Get available seats for this flight, excluding seats the user already selected
+        List<Seat> seats = seatRepository.findByFlightId(flightId).stream()
                 .filter(Seat::isAvailable)
-                .filter(s -> !window || s.isWindow())  
-                .filter(s -> !legroom || s.hasExtraLegroom())  
-                .filter(s -> !nearExit || s.isNearExit())  
-                .findFirst()
-                .orElse(null);
+                .filter(s -> !excludedSeatNumbers.contains(s.getSeatNumber()))
+                .collect(Collectors.toList());
+
+        // 2) If only 1 passenger, apply preferences
+        if (passengerCount == 1) {
+            Optional<Seat> seatOpt = seats.stream()
+                    .filter(s -> !window   || s.isWindow())
+                    .filter(s -> !legroom || s.hasExtraLegroom())
+                    .filter(s -> !nearExit|| s.isNearExit())
+                    .findFirst();
+
+            return seatOpt
+                    .map(Collections::singletonList)
+                    .orElse(Collections.emptyList());
+        }
+
+        // 3) For multiple passengers, ignore window/legroom/nearExit
+        //    and look for a block of 'passengerCount' adjacent seats in the same row
+        //    (Assumes seatNumber format like "A10" => letter + row number).
+        Map<Integer, List<Seat>> seatsByRow = seats.stream()
+                .collect(Collectors.groupingBy(seat -> {
+                    // Extract row from seatNumber (e.g. "B12" => row 12)
+                    String rowPart = seat.getSeatNumber().substring(1);
+                    return Integer.parseInt(rowPart);
+                }));
+
+        for (Map.Entry<Integer, List<Seat>> entry : seatsByRow.entrySet()) {
+            List<Seat> rowSeats = entry.getValue();
+
+            // Sort by seat letter
+            rowSeats.sort(Comparator.comparingInt(s -> s.getSeatNumber().charAt(0)));
+
+            // Attempt to find a block of 'passengerCount' consecutive letters
+            for (int i = 0; i <= rowSeats.size() - passengerCount; i++) {
+                boolean blockFound = true;
+                List<Seat> block = new ArrayList<>();
+                block.add(rowSeats.get(i));
+
+                for (int j = 1; j < passengerCount; j++) {
+                    char prevLetter = rowSeats.get(i + j - 1).getSeatNumber().charAt(0);
+                    char currLetter = rowSeats.get(i + j).getSeatNumber().charAt(0);
+                    // If letters aren't consecutive (e.g. 'B' is charCode 66, 'A' is 65)
+                    if (currLetter - prevLetter != 1) {
+                        blockFound = false;
+                        break;
+                    }
+                    block.add(rowSeats.get(i + j));
+                }
+
+                if (blockFound) {
+                    return block;
+                }
+            }
+        }
+
+        // 4) If no row has a suitable block, return empty
+        return Collections.emptyList();
     }
 }
 
