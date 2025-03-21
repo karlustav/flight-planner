@@ -3,9 +3,9 @@ header {
     background: linear-gradient(to right, #1e3a8a, #2563eb);
     padding: 1rem;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  header nav ul {
+}
+
+header nav ul {
     list-style: none;
     display: flex;
     justify-content: center;
@@ -13,97 +13,229 @@ header {
     gap: 2rem;
     margin: 0;
     padding: 0;
-  }
-  
-  header nav ul li a {
+}
+
+header nav ul li a {
     color: #fff;
     text-decoration: none;
     font-weight: 600;
     padding: 0.5rem 1rem;
     transition: background 0.3s ease, color 0.3s ease;
-  }
-  
-  header nav ul li a:hover,
-  header nav ul li a.active {
+}
+
+header nav ul li a:hover,
+header nav ul li a.active {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
+}
+
+/* Main Layout */
+.flight-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+/* Make Flight Info and Recommend Seat sticky */
+.flight-info, .recommendation-panel {
+    width: 25%;
+    position: sticky;
+    top: 25px;
+    margin-top: 25px;
+    align-self: flex-start;
+}
+
+/* Flight Info Box */
+.flight-info {
+    background: #f1f1f1;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn {
+    padding: 1rem 2rem;
+    margin-top: 20px;
+    border: none;
+    background: #1e3a8a;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
   }
-  
-  /* Seats Layout (unchanged) */
-  .plane-background {
-      background: rgba(160, 209, 248, 0.2);  /* Light blue */
-      border-radius: 60px;
-      padding: 30px 20px;    /* Smaller padding */
-      margin: 0 auto;        /* Center horizontally */
-      max-width: 600px;      /* Shrink overall width */
-  }
-  
-  /* The container holding all rows */
-  #seatContainer {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      max-width: 600px;      /* Keep seat layout narrower than the plane background */
-      margin: 0 auto;        /* Center horizontally inside .plane-background */
-  }
-    
-  /* Each row is a horizontal flex container */
-  .seat-row {
-      display: flex;
-      align-items: center;
-      justify-content: center; /* Center seats horizontally within the row */
-      gap: 20px;
-      flex-wrap: nowrap;       /* Prevent wrapping */
-  }
-    
-  /* Left & right seat sections */
-  .seat-section {
-      display: flex;
-      gap: 10px;
-  }
-    
-  /* Aisle between seat sections */
-  .aisle {
-      width: 30px;  /* empty space for aisle */
-  }
-    
-  /* Seat styling */
-  .seat {
-      width: 60px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #e0e0e0;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s ease, transform 0.3s ease;
-      text-align: center;
-  }
-    
-  .seat:hover {
-      background: #b3e5fc;
-      transform: translateY(-3px);
-  }
-    
-  .seat.available {
-      background: #8bc34a;
-      color: #fff;
-  }
-    
-  .seat.booked {
-      background: #e57373;
-      color: #fff;
-      cursor: not-allowed;
-  }
-    
-  .seat.selected {
-      outline: 3px solid #ffc107;
-  }
-    
-  /* Extra spacing every 5 rows, if desired */
-  .extra-gap {
-      margin-bottom: 30px;
-  }
-  
+
+.btn:hover {
+    background: #163172;
+}
+
+/* Seat Selection */
+.seat-selection-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+}
+
+/* Plane Background */
+.plane-background {
+    background: rgba(160, 209, 248, 0.2);
+    border-radius: 60px;
+    padding: 30px 20px;
+    margin: 0 auto;
+    max-width: 600px;
+    text-align: center;
+}
+
+/* Seat Container */
+#seatContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Seat Row */
+.seat-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: nowrap;
+}
+
+/* Left & Right Sections */
+.seat-section {
+    display: flex;
+    gap: 10px;
+}
+
+/* Aisle */
+.aisle {
+    width: 30px;
+}
+
+/* Seat Styling */
+.seat {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0e0e0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+    text-align: center;
+}
+
+.seat:hover {
+    background: #b3e5fc;
+    transform: translateY(-3px);
+}
+
+.seat.available {
+    background: #8bc34a;
+    color: #fff;
+}
+
+.seat.booked {
+    background: #e57373;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+/* Selected Seat */
+.seat.selected {
+    background:  #ffc107;
+}
+
+/* Extra spacing every 5 rows */
+.seat-row:nth-child(5n) {
+    margin-bottom: 30px;
+}
+
+/* Container Layout */
+.flight-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+/* Flight Info & Recommendation Panel Background */
+.flight-info, .recommendation-panel {
+    width: 25%;
+    padding: 1.5rem;
+    background: #f1f1f1;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 10px;
+}
+
+/* Seat Selection Container */
+.seat-selection-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+}
+
+/* Plane Background */
+.plane-background {
+    background: rgba(160, 209, 248, 0.2);
+    border-radius: 60px;
+    padding: 30px 20px;
+    margin: 0 auto;
+    max-width: 600px;
+    text-align: center;
+}
+
+/* Seat Recommendation Panel */
+.recommendation-panel {
+    width: 25%;
+    text-align: left;
+}
+
+/* Preferences Section */
+.preferences {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.preferences label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+}
+
+.preferences input[type="checkbox"] {
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+/* Recommend Seat Button */
+#recommend-seat-btn {
+    display: block;
+    background: #ffcd38;
+    color: #1e3a8a;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+#recommend-seat-btn:hover {
+    background: #ffc107;
+}

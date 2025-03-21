@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="src/styles/global.css">
 </head>
-<body>
+<body class="index-page">
   <header>
     <nav>
       <ul>
@@ -18,11 +18,14 @@
   </header>
   <main>
     <section class="hero">
-      <h1>Welcome to Flight Planner</h1>
-      <p>Plan your perfect flight with ease.</p>
-      <a href="flights.html" class="btn">View Flights</a>
+      <div class="hero-content">
+        <h1>Welcome to Flight Planner</h1>
+        <p>Plan your perfect flight with ease.</p>
+        <a href="flights.html" class="btn">View Flights</a>
+      </div>
     </section>
   </main>
+  
   <footer>
     <p>&copy; 2025 Flight Planner</p>
   </footer>
@@ -53,7 +56,7 @@ temp_file=$(mktemp /tmp/project_debug.XXXXXX)
 echo "Writing output to temporary file: $temp_file"
 
 # Exclude the output file by name, the node_modules directory, and the src/images folder
-find . \( -type d -name "node_modules" -o -path "./src/images" \) -prune -o \
+find . \( -type d -name "node_modules" -o -path "./public" \) -prune -o \
        -type f ! -name "$(basename "$output_file")" -print0 | while IFS= read -r -d '' file; do
     # Remove the leading "./" for a cleaner output.
     relative="${file#./}"
@@ -92,7 +95,7 @@ echo "Done! Output written to $output_file"
       <div class="search-bar">
         <input type="text" id="origin" placeholder="Origin">
         <input type="text" id="destination" placeholder="Destination">
-        <input type="time" id="time">
+        <input type="date" id="date">
         <button id="search-btn" class="btn">Search</button>
       </div>
     </section>
@@ -101,10 +104,11 @@ echo "Done! Output written to $output_file"
         <thead>
           <tr>
             <th>Company</th>
-            <th>Origin</th>
-            <th>Destination</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Date & Time</th>
             <th>Price</th>
-            <th>Action</th>
+            <th>Buy Tickets</th>
           </tr>
         </thead>
         <tbody>
@@ -120,8 +124,6 @@ echo "Done! Output written to $output_file"
 </body>
 </html>
 
-//public/vite.svg
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
 //.gitignore
 # Logs
 logs
@@ -1191,19 +1193,43 @@ export default defineConfig({
       </ul>
     </nav>
   </header>
-  <main>
+  
+  <main class="flight-container">
+    <!-- Left: Flight Info (Sticky) -->
     <section class="flight-info">
       <h1 id="flightTitle">Loading flight...</h1>
-      <p id="flightDetails"></p>
+      <p><strong>From:</strong> <span id="flightOrigin"></span></p>
+      <p><strong>To:</strong> <span id="flightDestination"></span></p>
+      <p><strong>Departure:</strong> <span id="flightTime"></span></p>
+      <p><strong>Base Price:</strong> $<span id="flightPrice"></span></p>
+      <p><strong>Total Price:</strong> $<span id="totalPrice">0</span></p>
+      <button id="confirm-and-buy" class="btn"> Proceed to Checkout</button>
     </section>
-    <section class="seat-selection">
-      <h2>Select a Seat</h2>
+  
+    <!-- Center: Seat Map -->
+    <section class="seat-selection-container">
       <div class="plane-background">
+        <h2>Select Your Seats</h2>
         <div id="seatContainer"></div>
       </div>
     </section>
-    <a href="flights.html" class="btn back-btn">Back to Flights</a>
+
+    <!-- Right: Recommend Seat Button (Sticky) -->
+    <section class="recommendation-panel">
+      <h2>Seat Recommendation</h2>
+      
+      <strong>Select Preferences:</strong>
+      <div class="preferences">
+        <label><input type="checkbox" id="pref-window" value="window"> Window Seat</label>
+        <label><input type="checkbox" id="pref-legroom" value="legroom"> Extra Legroom</label>
+        <label><input type="checkbox" id="pref-exit" value="exit"> Near Exit</label>
+        <label><input type="checkbox" id="pref-aisle" value="aisle"> Aisle Seat</label>
+      </div>
+  
+      <button id="recommend-seat-btn" class="btn">Recommend Seat</button>
+    </section>
   </main>
+  
   <footer>
     <p>&copy; 2025 Flight Planner</p>
   </footer>
@@ -1217,9 +1243,9 @@ header {
     background: linear-gradient(to right, #1e3a8a, #2563eb);
     padding: 1rem;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  header nav ul {
+}
+
+header nav ul {
     list-style: none;
     display: flex;
     justify-content: center;
@@ -1227,100 +1253,233 @@ header {
     gap: 2rem;
     margin: 0;
     padding: 0;
-  }
-  
-  header nav ul li a {
+}
+
+header nav ul li a {
     color: #fff;
     text-decoration: none;
     font-weight: 600;
     padding: 0.5rem 1rem;
     transition: background 0.3s ease, color 0.3s ease;
-  }
-  
-  header nav ul li a:hover,
-  header nav ul li a.active {
+}
+
+header nav ul li a:hover,
+header nav ul li a.active {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
+}
+
+/* Main Layout */
+.flight-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+/* Make Flight Info and Recommend Seat sticky */
+.flight-info, .recommendation-panel {
+    width: 25%;
+    position: sticky;
+    top: 25px;
+    margin-top: 25px;
+    align-self: flex-start;
+}
+
+/* Flight Info Box */
+.flight-info {
+    background: #f1f1f1;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn {
+    padding: 1rem 2rem;
+    margin-top: 20px;
+    border: none;
+    background: #1e3a8a;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
   }
-  
-  /* Seats Layout (unchanged) */
-  .plane-background {
-      background: rgba(160, 209, 248, 0.2);  /* Light blue */
-      border-radius: 60px;
-      padding: 30px 20px;    /* Smaller padding */
-      margin: 0 auto;        /* Center horizontally */
-      max-width: 600px;      /* Shrink overall width */
-  }
-  
-  /* The container holding all rows */
-  #seatContainer {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      max-width: 600px;      /* Keep seat layout narrower than the plane background */
-      margin: 0 auto;        /* Center horizontally inside .plane-background */
-  }
-    
-  /* Each row is a horizontal flex container */
-  .seat-row {
-      display: flex;
-      align-items: center;
-      justify-content: center; /* Center seats horizontally within the row */
-      gap: 20px;
-      flex-wrap: nowrap;       /* Prevent wrapping */
-  }
-    
-  /* Left & right seat sections */
-  .seat-section {
-      display: flex;
-      gap: 10px;
-  }
-    
-  /* Aisle between seat sections */
-  .aisle {
-      width: 30px;  /* empty space for aisle */
-  }
-    
-  /* Seat styling */
-  .seat {
-      width: 60px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #e0e0e0;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s ease, transform 0.3s ease;
-      text-align: center;
-  }
-    
-  .seat:hover {
-      background: #b3e5fc;
-      transform: translateY(-3px);
-  }
-    
-  .seat.available {
-      background: #8bc34a;
-      color: #fff;
-  }
-    
-  .seat.booked {
-      background: #e57373;
-      color: #fff;
-      cursor: not-allowed;
-  }
-    
-  .seat.selected {
-      outline: 3px solid #ffc107;
-  }
-    
-  /* Extra spacing every 5 rows, if desired */
-  .extra-gap {
-      margin-bottom: 30px;
-  }
-  
+
+.btn:hover {
+    background: #163172;
+}
+
+/* Seat Selection */
+.seat-selection-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+}
+
+/* Plane Background */
+.plane-background {
+    background: rgba(160, 209, 248, 0.2);
+    border-radius: 60px;
+    padding: 30px 20px;
+    margin: 0 auto;
+    max-width: 600px;
+    text-align: center;
+}
+
+/* Seat Container */
+#seatContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Seat Row */
+.seat-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: nowrap;
+}
+
+/* Left & Right Sections */
+.seat-section {
+    display: flex;
+    gap: 10px;
+}
+
+/* Aisle */
+.aisle {
+    width: 30px;
+}
+
+/* Seat Styling */
+.seat {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0e0e0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+    text-align: center;
+}
+
+.seat:hover {
+    background: #b3e5fc;
+    transform: translateY(-3px);
+}
+
+.seat.available {
+    background: #8bc34a;
+    color: #fff;
+}
+
+.seat.booked {
+    background: #e57373;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+/* Selected Seat */
+.seat.selected {
+    background:  #ffc107;
+}
+
+/* Extra spacing every 5 rows */
+.seat-row:nth-child(5n) {
+    margin-bottom: 30px;
+}
+
+/* Container Layout */
+.flight-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+/* Flight Info & Recommendation Panel Background */
+.flight-info, .recommendation-panel {
+    width: 25%;
+    padding: 1.5rem;
+    background: #f1f1f1;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 10px;
+}
+
+/* Seat Selection Container */
+.seat-selection-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+}
+
+/* Plane Background */
+.plane-background {
+    background: rgba(160, 209, 248, 0.2);
+    border-radius: 60px;
+    padding: 30px 20px;
+    margin: 0 auto;
+    max-width: 600px;
+    text-align: center;
+}
+
+/* Seat Recommendation Panel */
+.recommendation-panel {
+    width: 25%;
+    text-align: left;
+}
+
+/* Preferences Section */
+.preferences {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.preferences label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+}
+
+.preferences input[type="checkbox"] {
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+/* Recommend Seat Button */
+#recommend-seat-btn {
+    display: block;
+    background: #ffcd38;
+    color: #1e3a8a;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+#recommend-seat-btn:hover {
+    background: #ffc107;
+}
+
 //src/styles/global.css
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
@@ -1343,6 +1502,7 @@ header {
   padding: 1rem 0;
   color: #fff;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  
 }
 
 nav ul {
@@ -1388,6 +1548,21 @@ footer {
 .hero {
   text-align: center;
   padding: 4rem 2rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-content {
+  background: rgba(0, 0, 0, 0.6); /* Dark semi-transparent background */
+  padding: 2rem;
+  border-radius: 10px;
+  color: white;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .hero h1 {
@@ -1399,6 +1574,15 @@ footer {
   font-size: 1.2rem;
   margin-bottom: 2rem;
 }
+
+.index-page {
+  background-image: url('../../vanalinn.jpg'); /* Adjust path if needed */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+}
+
 
 /* Button Styling */
 .btn {
@@ -1497,23 +1681,30 @@ console.log("Flight Planner Loaded");
 import { fetchSeatsByFlight } from "../api/seatsApi";
 import { getFlightById } from "../api/flightsApi";
 
-// Get flight ID from URL (as a number)
 const urlParams = new URLSearchParams(window.location.search);
 const flightId = Number(urlParams.get("flightId"));
 
+let basePrice = 0;
+let selectedSeats: Set<string> = new Set();
+
 document.addEventListener("DOMContentLoaded", async () => {
   if (!flightId) {
-    document.getElementById("flightTitle")!.textContent = "Invalid Flight ID";
+    document.getElementById("flightTitle")!.textContent = "Invalid Flight";
     return;
   }
 
   try {
-    // Use the getFlightById function to fetch flight details
+    // Fetch flight details
     const flight = await getFlightById(flightId);
-    document.getElementById("flightTitle")!.textContent = `Flight ${flight.id}: ${flight.origin} → ${flight.destination}`;
-    document.getElementById("flightDetails")!.innerHTML = `Company: ${flight.company} <br> Price: $${flight.price}`;
+    basePrice = flight.price;
+    
+    document.getElementById("flightTitle")!.textContent = `Flight: ${flight.origin} → ${flight.destination}`;
+    document.getElementById("flightOrigin")!.textContent = flight.origin;
+    document.getElementById("flightDestination")!.textContent = flight.destination;
+    document.getElementById("flightTime")!.textContent = new Date(flight.departureTime).toLocaleString("en-GB");
+    document.getElementById("flightPrice")!.textContent = basePrice.toString();
 
-    // Fetch the seats for this flight and render them
+    // Fetch and render seats
     const seats = await fetchSeatsByFlight(flightId);
     renderSeats(seats);
   } catch (error) {
@@ -1525,89 +1716,100 @@ function renderSeats(seats: any[]) {
   const container = document.getElementById("seatContainer")!;
   container.innerHTML = "";
 
-  // Group seats by row number (assuming seatNumber is in the format Letter + Number, e.g. "A1")
   const rows: Record<number, any[]> = {};
   seats.forEach(seat => {
     const rowNum = parseInt(seat.seatNumber.slice(1));
-    if (!rows[rowNum]) {
-      rows[rowNum] = [];
-    }
+    if (!rows[rowNum]) rows[rowNum] = [];
     rows[rowNum].push(seat);
   });
 
-  // Sort row numbers and render each row
-  const sortedRowNumbers = Object.keys(rows)
-    .map(Number)
-    .sort((a, b) => a - b);
+  Object.keys(rows).map(Number).sort((a, b) => a - b).forEach(rowNum => {
+    const rowSeats = rows[rowNum].sort((a, b) => a.seatNumber[0].localeCompare(b.seatNumber[0]));
 
-  sortedRowNumbers.forEach(rowNum => {
-    const rowSeats = rows[rowNum];
-
-    // Sort seats in the row alphabetically by their letter
-    rowSeats.sort((a, b) => {
-      const letterA = a.seatNumber[0].toUpperCase();
-      const letterB = b.seatNumber[0].toUpperCase();
-      return letterA < letterB ? -1 : letterA > letterB ? 1 : 0;
-    });
-
-    // Split into left (A, B, C) and right (D, E, F) sections
-    const leftSectionSeats = rowSeats.filter(seat =>
-      ["A", "B", "C"].includes(seat.seatNumber[0].toUpperCase())
-    );
-    const rightSectionSeats = rowSeats.filter(seat =>
-      ["D", "E", "F"].includes(seat.seatNumber[0].toUpperCase())
-    );
-
-    // Create a row container
     const rowDiv = document.createElement("div");
     rowDiv.className = "seat-row";
 
-    // Optionally, add extra spacing every 5 rows
-    if (rowNum % 5 === 0) {
-      rowDiv.classList.add("extra-gap");
-    }
-
-    // Create left section container
     const leftSection = document.createElement("div");
-    leftSection.className = "seat-section left";
-    leftSectionSeats.forEach(seat => {
-      const seatButton = document.createElement("button");
-      seatButton.textContent = seat.seatNumber;
-      seatButton.className = seat.available ? "seat available" : "seat booked";
-      seatButton.disabled = !seat.available;
-      seatButton.addEventListener("click", () => {
-        rowDiv.querySelectorAll(".seat.selected").forEach(el => el.classList.remove("selected"));
-        seatButton.classList.add("selected");
-      });
-      leftSection.appendChild(seatButton);
-    });
-
-    // Create right section container
+    leftSection.className = "seat-section";
     const rightSection = document.createElement("div");
-    rightSection.className = "seat-section right";
-    rightSectionSeats.forEach(seat => {
-      const seatButton = document.createElement("button");
-      seatButton.textContent = seat.seatNumber;
-      seatButton.className = seat.available ? "seat available" : "seat booked";
-      seatButton.disabled = !seat.available;
-      seatButton.addEventListener("click", () => {
-        rowDiv.querySelectorAll(".seat.selected").forEach(el => el.classList.remove("selected"));
-        seatButton.classList.add("selected");
-      });
-      rightSection.appendChild(seatButton);
-    });
-
-    // Create an aisle divider
+    rightSection.className = "seat-section";
     const aisleDiv = document.createElement("div");
     aisleDiv.className = "aisle";
 
-    // Assemble the row
+    rowSeats.forEach(seat => {
+      const seatButton = document.createElement("button");
+      seatButton.textContent = seat.seatNumber;
+      seatButton.className = seat.available ? "seat available" : "seat booked";
+      seatButton.disabled = !seat.available;
+
+      seatButton.addEventListener("click", () => toggleSeatSelection(seat.seatNumber, seatButton));
+
+      (["A", "B", "C"].includes(seat.seatNumber[0]) ? leftSection : rightSection).appendChild(seatButton);
+    });
+
     rowDiv.appendChild(leftSection);
     rowDiv.appendChild(aisleDiv);
     rowDiv.appendChild(rightSection);
     container.appendChild(rowDiv);
   });
 }
+
+function toggleSeatSelection(seatNumber: string, button: HTMLElement) {
+  if (selectedSeats.has(seatNumber)) {
+    selectedSeats.delete(seatNumber);
+    button.classList.remove("selected");
+  } else {
+    selectedSeats.add(seatNumber);
+    button.classList.add("selected");
+  }
+  updateTotalPrice();
+}
+
+function updateTotalPrice() {
+  const totalPrice = selectedSeats.size * basePrice;
+  document.getElementById("totalPrice")!.textContent = totalPrice.toString();
+}
+
+
+export async function getRecommendedSeat(options: {
+  window: boolean;
+  legroom: boolean;
+  nearExit: boolean;
+}): Promise<any> {
+  const query = new URLSearchParams({
+    window: options.window.toString(),
+    legroom: options.legroom.toString(),
+    nearExit: options.nearExit.toString(),
+  });
+
+  const response = await fetch(`http://localhost:8080/api/seats/recommend?${query.toString()}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch recommended seat");
+  }
+  return response.json();
+}
+
+
+// **Recommend Seat**
+document.getElementById("recommend-seat-btn")!.addEventListener("click", async () => {
+  try {
+    // Call the backend to get a recommended seat. Adjust options as needed.
+    const recommendedSeat = await getRecommendedSeat({ window: true, legroom: true, nearExit: false });
+    
+    if (recommendedSeat && recommendedSeat.seatNumber) {
+      // Find the corresponding seat element in the DOM and update the UI.
+      const seatElement = document.querySelector(`button.seat.available[data-seat-number="${recommendedSeat.seatNumber}"]`) as HTMLElement;
+      if (seatElement) {
+        seatElement.classList.add("selected");
+      } else {
+        console.warn("Recommended seat not found in the UI");
+      }
+    }
+  } catch (error) {
+    console.error("Error recommending seat:", error);
+  }
+});
+
 
 //src/scripts/flights.ts
 import { fetchFlights } from "../api/flightsApi";
@@ -1617,6 +1819,7 @@ interface Flight {
   company: string;
   origin: string;
   destination: string;
+  departureTime: string;
   price: number;
   time: string;
 }
@@ -1640,28 +1843,42 @@ function renderFlights(flights: Flight[]) {
   const tbody = document.querySelector("#flightsTable tbody");
   if (!tbody) return;
   tbody.innerHTML = "";
+
   if (flights.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5">No flights available.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6">No flights available.</td></tr>`;
     return;
   }
+
+  // **Sort flights by departureTime**
+  flights.sort((a, b) => new Date(a.departureTime).getTime() - new Date(b.departureTime).getTime());
+
   flights.forEach(flight => {
+    const departureDate = new Date(flight.departureTime);
+    const formattedDate = departureDate.toLocaleDateString("en-GB").replace(/\//g, "."); // Format: DD.MM.YYYY
+    const formattedTime = departureDate.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }); // HH:MM format
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${flight.company}</td>
       <td>${flight.origin}</td>
       <td>${flight.destination}</td>
+      <td>${formattedDate} ${formattedTime}</td> <!-- Date and Time in one cell -->
       <td>$${flight.price}</td>
-      <td><a href="flight.html?flightId=${flight.id}">View Seats</a></td>
+      <td><a href="flight.html?flightId=${flight.id}" class="btn buy-btn">Buy Ticket</a></td>
     `;
     tbody.appendChild(tr);
   });
 }
 
+
+
+
+
 function filterFlights() {
   const originInput = (document.getElementById("origin") as HTMLInputElement).value.toLowerCase();
   const destinationInput = (document.getElementById("destination") as HTMLInputElement).value.toLowerCase();
-  const timeInput = (document.getElementById("time") as HTMLInputElement).value;
-  
+  const dateInput = (document.getElementById("date") as HTMLInputElement).value; // Ensure this is a date input
+
   const filtered = allFlights.filter(flight => {
     let matches = true;
     if (originInput && !flight.origin.toLowerCase().includes(originInput)) {
@@ -1670,14 +1887,28 @@ function filterFlights() {
     if (destinationInput && !flight.destination.toLowerCase().includes(destinationInput)) {
       matches = false;
     }
-    // Here the time filter checks for an exact match. Adjust if needed.
-    if (timeInput && flight.time !== timeInput) {
-      matches = false;
+    if (dateInput) {
+      const flightDate = new Date(flight.departureTime).toISOString().split("T")[0]; // Extract only YYYY-MM-DD
+      if (flightDate !== dateInput) {
+        matches = false;
+      }
     }
     return matches;
   });
+
   renderFlights(filtered);
 }
+
+const searchInputs = document.querySelectorAll<HTMLInputElement>("#origin, #destination, #date");
+searchInputs.forEach(input => {
+  input.addEventListener("keypress", (event: KeyboardEvent) => { // Explicitly type as KeyboardEvent
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevents form submission if inside a form
+      filterFlights();
+    }
+  });
+});
+
 
 document.getElementById("search-btn")?.addEventListener("click", filterFlights);
 
