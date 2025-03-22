@@ -13,6 +13,7 @@
       <ul>
         <li><a href="index.html" class="active">Home</a></li>
         <li><a href="flights.html">Flights</a></li>
+        <li><a href="bookings.html">My Bookings</a></li>
       </ul>
     </nav>
   </header>
@@ -86,6 +87,7 @@ echo "Done! Output written to $output_file"
       <ul>
         <li><a href="index.html">Home</a></li>
         <li><a href="flights.html" class="active">Flights</a></li>
+        <li><a href="bookings.html">My Bookings</a></li>
       </ul>
     </nav>
   </header>
@@ -1129,6 +1131,36 @@ dist-ssr
   }
 }
 
+//bookings.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Bookings</title>
+  <link rel="stylesheet" href="src/styles/global.css">
+  <link rel="stylesheet" href="src/styles/bookings.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="flights.html">Flights</a></li>
+        <li><a href="bookings.html" class="active">My Bookings</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <div id="bookingsContainer" class="bookings-container"></div>
+  </main>
+  <footer>
+    <p>&copy; 2025 Flight Planner</p>
+  </footer>
+  <!-- Add the script that renders the boarding passes -->
+  <script type="module" src="src/scripts/bookings.ts"></script>
+</body>
+</html>
+
 //tsconfig.json
 {
   "compilerOptions": {
@@ -1190,6 +1222,7 @@ export default defineConfig({
       <ul>
         <li><a href="index.html">Home</a></li>
         <li><a href="flights.html">Flights</a></li>
+        <li><a href="bookings.html">My Bookings</a></li>
       </ul>
     </nav>
   </header>
@@ -1202,8 +1235,8 @@ export default defineConfig({
       <p><strong>To:</strong> <span id="flightDestination"></span></p>
       <p><strong>Departure:</strong> <span id="flightTime"></span></p>
       <p><strong>Base Price:</strong> $<span id="flightPrice"></span></p>
-      <p><strong>Total Price:</strong> $<span id="totalPrice">0</span></p>
-      <button id="confirm-and-buy" class="btn"> Proceed to Checkout</button>
+      <p><strong id="total-price">Total Price:</strong> $<span id="totalPrice">0</span></p>
+      <button id="confirm-and-buy" class="btn"> Confirm Booking</button>
     </section>
   
     <!-- Center: Seat Map -->
@@ -1218,6 +1251,7 @@ export default defineConfig({
     <section class="recommendation-panel">
       <h2>Seat Recommendation</h2>
       
+      <div id="recommendationError" class="error-banner"></div>
 
       <label for="passengerCount">Passengers:</label>
       <select id="passengerCount">
@@ -1230,9 +1264,8 @@ export default defineConfig({
         <label><input type="checkbox" id="pref-window" value="window"> Window Seat</label>
         <label><input type="checkbox" id="pref-legroom" value="legroom"> Extra Legroom</label>
         <label><input type="checkbox" id="pref-exit" value="exit"> Near Exit</label>
-        <label><input type="checkbox" id="pref-aisle" value="aisle"> Aisle Seat</label>
       </div>
-  
+      
       <button id="recommend-seat-btn" class="btn">Recommend Seat</button>
     </section>
   </main>
@@ -1499,6 +1532,98 @@ header nav ul li a.active {
     box-shadow: 0 0 5px #ffc107;
   }
   
+  /* Modernize the recommendation panel */
+.recommendation-panel {
+    width: 25%;
+    background: #fff; /* White for a clean card-like look */
+    padding: 1.5rem;
+    margin-top: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 10px;
+  }
+  
+  /* Headline styling */
+  .recommendation-panel h2 {
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    color: #1e3a8a;
+  }
+  
+  /* Label & select styling */
+  .recommendation-panel label,
+  .recommendation-panel strong {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  
+  .recommendation-panel select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font: inherit;
+    outline: none;
+  }
+  
+  /* Preferences checkboxes container */
+  .preferences {
+    margin-bottom: 1rem;
+  }
+  
+  /* Each preference label */
+  .preferences label {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  
+  .preferences input[type="checkbox"] {
+    margin-right: 0.5rem;
+    transform: scale(1.2);
+    cursor: pointer;
+  }
+  
+  /* Modern button styling */
+  #recommend-seat-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: #1e3a8a;
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    border: none;
+  }
+  
+  #recommend-seat-btn:hover {
+    background: #163172;
+  }
+  
+/* Error banner inside the recommendation panel */
+.error-banner {
+    display: none;                 /* Hidden by default */
+    background-color: #ff4d4f;     /* Red background */
+    color: #fff;                   /* White text */
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;           /* Space below the banner */
+    border-radius: 4px;            /* Slightly rounded corners */
+    font-weight: 500;              /* Bold text */
+    text-align: center;            /* Center the text */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .error-banner.visible {
+    display: block;               /* Show when .visible is added */
+  }
   
 //src/styles/global.css
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
@@ -1514,6 +1639,7 @@ body {
   background: #f9f9fb;
   color: #333;
   line-height: 1.6;
+  padding-bottom: 80px;
 }
 
 /* Header & Navigation */
@@ -1691,6 +1817,90 @@ table tr:nth-child(even) {
   background: #f9f9fb;
 }
 
+//src/styles/bookings.css
+.bookings-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 2rem;
+    justify-content: center;
+  }
+  
+  .boarding-pass {
+    width: 350px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    font-family: 'Roboto', sans-serif;
+    position: relative;
+  }
+  
+  .bp-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #1e3a8a;
+    padding: 0.75rem 1rem;
+    color: #fff;
+  }
+  
+  .bp-logo {
+    height: 40px;
+    width: auto;
+  }
+  
+  .bp-header h2 {
+    font-size: 1.2rem;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .bp-details {
+    padding: 1rem;
+    color: #333;
+  }
+  
+  .bp-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  
+  .bp-row .label {
+    font-weight: 600;
+    color: #555;
+  }
+  
+  .bp-row .value {
+    font-weight: 400;
+    color: #000;
+  }
+  
+  .bp-divider {
+    border-top: 1px dashed #ccc;
+    margin: 0 1rem;
+  }
+  
+  .bp-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: #f1f1f1;
+  }
+  
+  .bp-timestamp {
+    font-size: 0.75rem;
+    color: #777;
+  }
+  
+  .bp-barcode {
+    height: 40px;
+    width: auto;
+  }
+  
 //src/vite-env.d.ts
 /// <reference types="vite/client" />
 
@@ -1718,12 +1928,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  updateConfirmButtonState();
+
   try {
     // Fetch flight details
     const flight = await getFlightById(flightId);
     basePrice = flight.price;
     
-    document.getElementById("flightTitle")!.textContent = `Flight: ${flight.origin} → ${flight.destination}`;
+    document.getElementById("flightTitle")!.textContent = `${flight.origin} → ${flight.destination}`;
     document.getElementById("flightOrigin")!.textContent = flight.origin;
     document.getElementById("flightDestination")!.textContent = flight.destination;
     document.getElementById("flightTime")!.textContent = new Date(flight.departureTime).toLocaleString("en-GB");
@@ -1813,6 +2025,7 @@ function toggleSeatSelection(seatNumber: string, button: HTMLElement) {
     button.classList.add("selected");
   }
   updateTotalPrice();
+  updateConfirmButtonState();
 }
 
 // 6) Update total price
@@ -1841,46 +2054,203 @@ function markSeatAsRecommended(seatNumber: string) {
   }
 }
 
-// 9) "Recommend Seat" button logic
 document.getElementById("recommend-seat-btn")!.addEventListener("click", async () => {
+
+  hideRecommendationError();
+
   try {
-    // Remove any old recommended blinking
+
     clearRecommendedSeats();
 
-    // Read how many passengers from <select id="passengerCount">
     const passengerCountInput = document.getElementById("passengerCount") as HTMLSelectElement;
     const passengerCount = parseInt(passengerCountInput.value, 10) || 1;
 
-    // For a single passenger, we consider window/legroom/nearExit
-    // For multiple passengers, the backend will ignore these preferences
     const windowPref = (document.getElementById("pref-window") as HTMLInputElement).checked;
     const legroomPref = (document.getElementById("pref-legroom") as HTMLInputElement).checked;
     const exitPref = (document.getElementById("pref-exit") as HTMLInputElement).checked;
 
-    // Already selected seats should be excluded from the recommendation
     const excludedSeats = Array.from(selectedSeats).join(",");
 
-    // Call the backend
+    // Call the backend for recommended seats
     const recommendedSeats = await getRecommendedSeat({
       flightId,
       passengerCount,
       window: windowPref,
       legroom: legroomPref,
       nearExit: exitPref,
-      excluded: excludedSeats
+      excluded: excludedSeats,
     });
 
-    // If we got seats, blink them
     if (recommendedSeats.length > 0) {
       recommendedSeats.forEach((seat) => markSeatAsRecommended(seat.seatNumber));
     } else {
-      console.warn("No recommended seats found");
+      // Show a red banner if no seats are returned
+      showRecommendationError("No seats available with selected preferences. Please try again.");
     }
   } catch (error) {
     console.error("Error recommending seats:", error);
+    showRecommendationError("There was an error recommending seats. Please try again later.");
   }
 });
 
+function showRecommendationError(message: string) {
+  const errorBanner = document.getElementById("recommendationError") as HTMLElement;
+  errorBanner.textContent = message;
+  errorBanner.classList.add("visible");
+
+}
+
+function hideRecommendationError() {
+  const errorBanner = document.getElementById("recommendationError") as HTMLElement;
+  errorBanner.classList.remove("visible");
+}
+
+
+// Grab references to the select and checkboxes
+const passengerCountInput = document.getElementById("passengerCount") as HTMLSelectElement;
+const prefWindow = document.getElementById("pref-window") as HTMLInputElement;
+const prefLegroom = document.getElementById("pref-legroom") as HTMLInputElement;
+const prefExit = document.getElementById("pref-exit") as HTMLInputElement;
+
+// A helper function that toggles availability of checkboxes
+function togglePreferenceCheckboxes() {
+  const passengerCount = parseInt(passengerCountInput.value, 10);
+  const isSingle = passengerCount === 1;
+  
+  // Disable (and uncheck) all preference checkboxes if > 1 passenger
+  [prefWindow, prefLegroom, prefExit].forEach(checkbox => {
+    checkbox.disabled = !isSingle;
+    if (!isSingle) {
+      checkbox.checked = false;
+    }
+  });
+}
+
+document.getElementById("confirm-and-buy")!.addEventListener("click", () => {
+  // If no seats are selected, do nothing (button is hidden anyway)
+  if (selectedSeats.size === 0) {
+    return;
+  }
+
+  // Gather flight info from the DOM
+  const flightTitle = document.getElementById("flightTitle")!.textContent || "";
+  const flightOrigin = document.getElementById("flightOrigin")!.textContent || "";
+  const flightDestination = document.getElementById("flightDestination")!.textContent || "";
+  const flightTime = document.getElementById("flightTime")!.textContent || "";
+  const flightPrice = document.getElementById("flightPrice")!.textContent || "0";
+  const totalPrice = document.getElementById("totalPrice")!.textContent || "0";
+
+  // Retrieve any previous bookings from sessionStorage
+  const existingBookings = sessionStorage.getItem("bookings");
+  let bookings: any[] = existingBookings ? JSON.parse(existingBookings) : [];
+
+  // For each selected seat, mark it as booked in the UI and create a separate booking
+  Array.from(selectedSeats).forEach((seatNumber) => {
+    // Mark the seat as booked in the UI:
+    const seatButton = document.querySelector(
+      `button.seat.available[data-seat-number="${seatNumber}"]`
+    ) as HTMLButtonElement | null;
+    if (seatButton) {
+      seatButton.classList.remove("available", "selected");
+      seatButton.classList.add("booked");
+      seatButton.disabled = true;
+    }
+
+    // Create a separate booking record for this seat
+    const booking = {
+      flightTitle,
+      flightOrigin,
+      flightDestination,
+      flightTime,
+      flightPrice,
+      totalPrice,
+      seat: seatNumber, // single seat
+      timestamp: new Date().toLocaleString()
+    };
+    bookings.push(booking);
+  });
+
+  // Save all new bookings back to sessionStorage
+  sessionStorage.setItem("bookings", JSON.stringify(bookings));
+
+  // Clear the local selection & update the UI
+  selectedSeats.clear();
+  updateTotalPrice();
+  updateConfirmButtonState();
+
+  // Redirect to the bookings page
+  window.location.href = "bookings.html";
+});
+
+
+// Get a reference to the confirm button
+const confirmButton = document.getElementById("confirm-and-buy") as HTMLButtonElement;
+
+// Called whenever seats are toggled
+function updateConfirmButtonState() {
+  if (selectedSeats.size === 0) {
+    confirmButton.style.display = "none";
+  } else {
+    confirmButton.style.display = "inline-block";
+  }
+}
+
+// Call it once on page load, in case the user has a default value other than 1
+togglePreferenceCheckboxes();
+
+// Also call it whenever the user changes passenger count
+passengerCountInput.addEventListener("change", togglePreferenceCheckboxes);
+
+//src/scripts/bookings.ts
+document.addEventListener("DOMContentLoaded", () => {
+    const container = document.getElementById("bookingsContainer")!;
+    const bookingsJSON = sessionStorage.getItem("bookings");
+  
+    if (!bookingsJSON) {
+      container.innerHTML = "<p>No bookings yet.</p>";
+      return;
+    }
+  
+    const bookings = JSON.parse(bookingsJSON);
+    if (!bookings.length) {
+      container.innerHTML = "<p>No bookings yet.</p>";
+      return;
+    }
+  
+    bookings.forEach((booking: any) => {
+      // Create a “boarding pass” element with logo, details, divider, and barcode.
+      const passDiv = document.createElement("div");
+      passDiv.className = "boarding-pass";
+  
+      passDiv.innerHTML = `
+      <div class="bp-header">
+        <img src="/lennuki-logo.webp" alt="Plane Logo" class="bp-logo" />
+        <h2>Boarding Pass</h2>
+      </div>
+      <div class="bp-details">
+        <!-- Removed the "From" and "To" rows -->
+        <div class="bp-row"><span class="label">Flight:</span><span class="value">${booking.flightTitle}</span></div>
+        <div class="bp-row"><span class="label">Seat:</span><span class="value">${booking.seat}</span></div>
+        <div class="bp-row"><span class="label">Departure:</span><span class="value">${booking.flightTime}</span></div>
+        <div class="bp-row"><span class="label">Price:</span><span class="value">$${booking.flightPrice}</span></div>
+      </div>
+      <div class="bp-divider"></div>
+      <div class="bp-footer">
+        <span class="bp-timestamp">${booking.timestamp}</span>
+        <img src="/barcode.avif" alt="Barcode" class="bp-barcode" />
+      </div>
+    `;
+  
+      container.appendChild(passDiv);
+    });
+  
+    // “Back to Flights” button
+    const backBtn = document.getElementById("backToFlights") as HTMLButtonElement;
+    backBtn.addEventListener("click", () => {
+      window.location.href = "flights.html";
+    });
+  });
+  
 //src/scripts/flights.ts
 import { fetchFlights } from "../api/flightsApi";
 
@@ -1985,20 +2355,28 @@ document.getElementById("search-btn")?.addEventListener("click", filterFlights);
 document.addEventListener("DOMContentLoaded", loadFlights);
 
 //src/api/seatsApi.ts
-const API_URL = "http://localhost:8080/api/seats";
+// src/api/seatsApi.ts
 
-// or "http://localhost:8080/api/seats" if you aren't using a proxy in vite.config.ts
+// Use a relative path so Vite’s proxy (vite.config.ts) can handle it.
+// If you want to skip the proxy, you can do: const BASE_URL = "http://localhost:8080/api/seats";
+const BASE_URL = "/api/seats";
 
+/**
+ * Fetch seats for a given flight, from the endpoint:
+ * GET /api/seats/flight/{flightId}
+ */
 export async function fetchSeatsByFlight(flightId: number) {
-  const response = await fetch(`http://localhost:8080/flight/${flightId}`);
+  // Correct path: /api/seats/flight/{flightId}
+  const response = await fetch(`${BASE_URL}/flight/${flightId}`);
   if (!response.ok) {
-    throw new Error("Failed to fetch seats");
+    throw new Error(`Failed to fetch seats: ${response.status}`);
   }
   return response.json();
 }
 
 /**
- * Calls the backend /recommend endpoint, returning an array of Seat objects.
+ * Call the backend’s recommendation endpoint:
+ * GET /api/seats/recommend?flightId=...&passengerCount=...&excluded=... etc.
  */
 export async function getRecommendedSeat(options: {
   flightId: number;
@@ -2006,7 +2384,7 @@ export async function getRecommendedSeat(options: {
   window: boolean;
   legroom: boolean;
   nearExit: boolean;
-  excluded: string; // comma-separated seat numbers
+  excluded: string;
 }): Promise<any[]> {
   const query = new URLSearchParams({
     flightId: options.flightId.toString(),
@@ -2017,13 +2395,13 @@ export async function getRecommendedSeat(options: {
     excluded: options.excluded,
   });
 
-  const response = await fetch(`$http://localhost:8080/recommend?${query.toString()}`);
+  // Correct path: /api/seats/recommend
+  const response = await fetch(`${BASE_URL}/recommend?${query.toString()}`);
   if (!response.ok) {
-    throw new Error("Failed to fetch recommended seats");
+    throw new Error(`Failed to fetch recommended seats: ${response.status}`);
   }
-  return response.json(); // returns an array of seat objects
+  return response.json();
 }
-
 
 //src/api/flightsApi.ts
 const API_URL = "/api/flights"; // or "http://localhost:8080/api/flights"

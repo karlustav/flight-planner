@@ -54,9 +54,15 @@ header nav ul li a.active {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+#totalPriceContainer {
+    font-size: 1.5rem;
+    font: bold; 
+    margin-top: 40px
+  }
+
 .btn {
     padding: 1rem 2rem;
-    margin-top: 20px;
+    margin-top: 10px;
     border: none;
     background: #1e3a8a;
     color: #fff;
@@ -252,4 +258,96 @@ header nav ul li a.active {
     box-shadow: 0 0 5px #ffc107;
   }
   
+  /* Modernize the recommendation panel */
+.recommendation-panel {
+    width: 25%;
+    background: #fff; /* White for a clean card-like look */
+    padding: 1.5rem;
+    margin-top: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 10px;
+  }
+  
+  /* Headline styling */
+  .recommendation-panel h2 {
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    color: #1e3a8a;
+  }
+  
+  /* Label & select styling */
+  .recommendation-panel label,
+  .recommendation-panel strong {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  
+  .recommendation-panel select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font: inherit;
+    outline: none;
+  }
+  
+  /* Preferences checkboxes container */
+  .preferences {
+    margin-bottom: 1rem;
+  }
+  
+  /* Each preference label */
+  .preferences label {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  
+  .preferences input[type="checkbox"] {
+    margin-right: 0.5rem;
+    transform: scale(1.2);
+    cursor: pointer;
+  }
+  
+  /* Modern button styling */
+  #recommend-seat-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: #1e3a8a;
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    border: none;
+  }
+  
+  #recommend-seat-btn:hover {
+    background: #163172;
+  }
+  
+/* Error banner inside the recommendation panel */
+.error-banner {
+    display: none;                 /* Hidden by default */
+    background-color: #ff4d4f;     /* Red background */
+    color: #fff;                   /* White text */
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;           /* Space below the banner */
+    border-radius: 4px;            /* Slightly rounded corners */
+    font-weight: 500;              /* Bold text */
+    text-align: center;            /* Center the text */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .error-banner.visible {
+    display: block;               /* Show when .visible is added */
+  }
   

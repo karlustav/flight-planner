@@ -13,6 +13,7 @@
       <ul>
         <li><a href="index.html">Home</a></li>
         <li><a href="flights.html">Flights</a></li>
+        <li><a href="bookings.html">My Bookings</a></li>
       </ul>
     </nav>
   </header>
@@ -25,8 +26,10 @@
       <p><strong>To:</strong> <span id="flightDestination"></span></p>
       <p><strong>Departure:</strong> <span id="flightTime"></span></p>
       <p><strong>Base Price:</strong> $<span id="flightPrice"></span></p>
-      <p><strong>Total Price:</strong> $<span id="totalPrice">0</span></p>
-      <button id="confirm-and-buy" class="btn"> Proceed to Checkout</button>
+      <p id="totalPriceContainer">
+        <strong id="total-price">Total Price:</strong> $<span id="totalPrice">0</span>
+      </p>
+      <button id="confirm-and-buy" class="btn"> Confirm Booking</button>
     </section>
   
     <!-- Center: Seat Map -->
@@ -41,6 +44,7 @@
     <section class="recommendation-panel">
       <h2>Seat Recommendation</h2>
       
+      <div id="recommendationError" class="error-banner"></div>
 
       <label for="passengerCount">Passengers:</label>
       <select id="passengerCount">
@@ -53,9 +57,8 @@
         <label><input type="checkbox" id="pref-window" value="window"> Window Seat</label>
         <label><input type="checkbox" id="pref-legroom" value="legroom"> Extra Legroom</label>
         <label><input type="checkbox" id="pref-exit" value="exit"> Near Exit</label>
-        <label><input type="checkbox" id="pref-aisle" value="aisle"> Aisle Seat</label>
       </div>
-  
+      
       <button id="recommend-seat-btn" class="btn">Recommend Seat</button>
     </section>
   </main>
