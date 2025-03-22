@@ -24,7 +24,7 @@ Before running the project, ensure you have the following prerequisites installe
 - **Maven** (if not installed, you can use the provided Maven Wrapper)
 
 ### For the Frontend
-- **Node.js** (version 12 or later)
+- **Node.js** (version 18 or later)
 - **npm** (Node Package Manager)
 
   
