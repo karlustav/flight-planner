@@ -30,8 +30,10 @@ Before running the project, ensure you have the following prerequisites installe
   
 ## Installation
 Clone the repository:
+```
 git clone https://github.com/karlustav/flight-planner
 cd flight-planner-project
+```
 
 
 ## Directory Structure:
@@ -43,16 +45,24 @@ The frontend code is located in the frontend folder.
 
 ### Backend
 Open a terminal and navigate to the backend folder:
+```
 cd backend
+```
 
 Run the backend service using the Maven Wrapper:
+```
 ./mvnw spring-boot:run
+```
 The backend server will start and listen on http://localhost:8080.
 
 ### Frontend
 Open a new terminal window or tab and navigate to the frontend folder:
+```
 cd frontend
+```
 
 Start the frontend development server:
+```
 npm run dev
+```
 The frontend will run on http://localhost:5137.
