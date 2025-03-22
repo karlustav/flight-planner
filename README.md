@@ -61,6 +61,11 @@ Open a new terminal window or tab and navigate to the frontend folder:
 cd frontend
 ```
 
+Install npm if you haven't already:
+```
+npm install
+```
+
 Start the frontend development server:
 ```
 npm run dev
