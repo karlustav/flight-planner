@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     bookings.forEach((booking: any) => {
-      // Create a “boarding pass” element with logo, details, divider, and barcode.
       const passDiv = document.createElement("div");
       passDiv.className = "boarding-pass";
   

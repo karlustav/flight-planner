@@ -35,7 +35,6 @@ function renderFlights(flights: Flight[]) {
     return;
   }
 
-  // **Sort flights by departureTime**
   flights.sort((a, b) => new Date(a.departureTime).getTime() - new Date(b.departureTime).getTime());
 
   flights.forEach(flight => {
@@ -87,9 +86,9 @@ function filterFlights() {
 
 const searchInputs = document.querySelectorAll<HTMLInputElement>("#origin, #destination, #date");
 searchInputs.forEach(input => {
-  input.addEventListener("keypress", (event: KeyboardEvent) => { // Explicitly type as KeyboardEvent
+  input.addEventListener("keypress", (event: KeyboardEvent) => {
     if (event.key === "Enter") {
-      event.preventDefault(); // Prevents form submission if inside a form
+      event.preventDefault();
       filterFlights();
     }
   });

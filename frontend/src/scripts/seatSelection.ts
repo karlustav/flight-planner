@@ -1,30 +1,15 @@
-// src/scripts/seatSelection.ts
-
 import { fetchSeatsByFlight, getRecommendedSeat } from "../api/seatsApi";
 import { getFlightById } from "../api/flightsApi";
 
-// 1) Read flightId from query params
+// Read flightId from query params
 const urlParams = new URLSearchParams(window.location.search);
 const flightId = Number(urlParams.get("flightId"));
 
-// 2) Price info & currently selected seats
+// Price info & currently selected seats
 let basePrice = 0;
 let selectedSeats: Set<string> = new Set();
 
-// Helper functions for booked seats (persisted in sessionStorage)
-function getBookedSeats(): string[] {
-  return JSON.parse(sessionStorage.getItem("bookedSeats") || "[]");
-}
-
-function addBookedSeat(seat: string) {
-  const bookedSeats = getBookedSeats();
-  if (!bookedSeats.includes(seat)) {
-    bookedSeats.push(seat);
-    sessionStorage.setItem("bookedSeats", JSON.stringify(bookedSeats));
-  }
-}
-
-// 3) On page load, fetch flight details + seats
+// On page load, fetch flight details + seats
 document.addEventListener("DOMContentLoaded", async () => {
   if (!flightId) {
     document.getElementById("flightTitle")!.textContent = "Invalid Flight";
@@ -52,11 +37,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// 4) Render seats in rows, marking any already booked from sessionStorage
+// Render seats in rows, marking any already booked for THIS flight
 function renderSeats(seats: any[]) {
   const container = document.getElementById("seatContainer")!;
   container.innerHTML = "";
-  const bookedSeats = getBookedSeats();
+  const bookedSeats = getBookedSeatsForFlight(flightId);
 
   // Group seats by row number
   const rows: Record<number, any[]> = {};
@@ -90,14 +75,14 @@ function renderSeats(seats: any[]) {
         seatButton.textContent = seat.seatNumber;
         seatButton.setAttribute("data-seat-number", seat.seatNumber);
 
-        // If the seat number is in bookedSeats, force booked styling
+        // If the seat is booked for this flight, apply booked styling
         if (bookedSeats.includes(seat.seatNumber)) {
           seatButton.className = "seat booked";
           seatButton.disabled = true;
         } else {
           seatButton.className = seat.available ? "seat available" : "seat booked";
           seatButton.disabled = !seat.available;
-          // Add click listener only for available seats
+          // Only add click listener if the seat is available
           if (seat.available) {
             seatButton.addEventListener("click", () => toggleSeatSelection(seat.seatNumber, seatButton));
           }
@@ -117,7 +102,7 @@ function renderSeats(seats: any[]) {
     });
 }
 
-// 5) Handle seat selection
+// Handle seat selection
 function toggleSeatSelection(seatNumber: string, button: HTMLElement) {
   if (button.classList.contains("recommended")) {
     button.classList.remove("recommended");
@@ -133,19 +118,19 @@ function toggleSeatSelection(seatNumber: string, button: HTMLElement) {
   updateConfirmButtonState();
 }
 
-// 6) Update total price
+// Update total price
 function updateTotalPrice() {
   const totalPrice = selectedSeats.size * basePrice;
   document.getElementById("totalPrice")!.textContent = totalPrice.toString();
 }
 
-// 7) Clear old recommended seats
+// Clear old recommended seats
 function clearRecommendedSeats() {
   const recommendedButtons = document.querySelectorAll("button.seat.recommended");
   recommendedButtons.forEach((btn) => btn.classList.remove("recommended"));
 }
 
-// 8) Mark seat as recommended (blinking effect, scroll into view, etc.)
+// Mark seat as recommended (blinking effect, scroll into view, etc.)
 function markSeatAsRecommended(seatNumber: string) {
   const seatElement = document.querySelector(
     `button.seat.available[data-seat-number="${seatNumber}"]`
@@ -158,7 +143,6 @@ function markSeatAsRecommended(seatNumber: string) {
   }
 }
 
-// Recommendation button listener
 document.getElementById("recommend-seat-btn")!.addEventListener("click", async () => {
   hideRecommendationError();
   try {
@@ -168,7 +152,13 @@ document.getElementById("recommend-seat-btn")!.addEventListener("click", async (
     const windowPref = (document.getElementById("pref-window") as HTMLInputElement).checked;
     const legroomPref = (document.getElementById("pref-legroom") as HTMLInputElement).checked;
     const exitPref = (document.getElementById("pref-exit") as HTMLInputElement).checked;
-    const excludedSeats = Array.from(selectedSeats).join(",");
+    
+    // Get the seats that are already booked for this flight.
+    const bookedSeats = getBookedSeatsForFlight(flightId);
+    
+    // Combine currently selected seats with already booked seats.
+    const excludedSet = new Set([...selectedSeats, ...bookedSeats]);
+    const excludedSeats = Array.from(excludedSet).join(",");
 
     const recommendedSeats = await getRecommendedSeat({
       flightId,
@@ -217,7 +207,7 @@ document.getElementById("confirm-and-buy")!.addEventListener("click", () => {
   let bookings: any[] = existingBookings ? JSON.parse(existingBookings) : [];
 
   Array.from(selectedSeats).forEach((seatNumber) => {
-    // Find the seat button regardless of state
+    // Find the seat button regardless of its state
     const seatButton = document.querySelector(
       `button.seat[data-seat-number="${seatNumber}"]`
     ) as HTMLButtonElement | null;
@@ -226,8 +216,8 @@ document.getElementById("confirm-and-buy")!.addEventListener("click", () => {
       seatButton.classList.add("booked");
       seatButton.disabled = true;
     }
-    // Add to booked seats list for persistence
-    addBookedSeat(seatNumber);
+    // Add this seat as booked for the current flight
+    addBookedSeatForFlight(flightId, seatNumber);
     // Create a booking record for this seat
     const booking = {
       flightTitle,
@@ -287,3 +277,20 @@ function togglePreferenceCheckboxes() {
 
 togglePreferenceCheckboxes();
 passengerCountInput.addEventListener("change", togglePreferenceCheckboxes);
+
+// Flight-Specific Booked Seats Helper
+function getBookedSeatsForFlight(flightId: number): string[] {
+  const booked = JSON.parse(sessionStorage.getItem("bookedSeats") || "{}");
+  return booked[flightId] || [];
+}
+
+function addBookedSeatForFlight(flightId: number, seat: string) {
+  const booked = JSON.parse(sessionStorage.getItem("bookedSeats") || "{}");
+  if (!booked[flightId]) {
+    booked[flightId] = [];
+  }
+  if (!booked[flightId].includes(seat)) {
+    booked[flightId].push(seat);
+  }
+  sessionStorage.setItem("bookedSeats", JSON.stringify(booked));
+}

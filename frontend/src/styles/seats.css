@@ -1,4 +1,3 @@
-/* Modern Header Styling */
 header {
     background: linear-gradient(to right, #1e3a8a, #2563eb);
     padding: 1rem;
@@ -29,7 +28,6 @@ header nav ul li a.active {
     border-radius: 4px;
 }
 
-/* Main Layout */
 .flight-container {
     display: flex;
     justify-content: space-between;
@@ -37,7 +35,6 @@ header nav ul li a.active {
     padding: 2rem;
 }
 
-/* Make Flight Info and Recommend Seat sticky */
 .flight-info, .recommendation-panel {
     width: 25%;
     position: sticky;
@@ -46,7 +43,6 @@ header nav ul li a.active {
     align-self: flex-start;
 }
 
-/* Flight Info Box */
 .flight-info {
     background: #f1f1f1;
     padding: 1.5rem;
@@ -75,7 +71,6 @@ header nav ul li a.active {
     background: #163172;
 }
 
-/* Seat Selection */
 .seat-selection-container {
     display: flex;
     flex-direction: column;
@@ -83,7 +78,6 @@ header nav ul li a.active {
     width: 50%;
 }
 
-/* Plane Background */
 .plane-background {
     background: rgba(160, 209, 248, 0.2);
     border-radius: 60px;
@@ -93,7 +87,6 @@ header nav ul li a.active {
     text-align: center;
 }
 
-/* Seat Container */
 #seatContainer {
     display: flex;
     flex-direction: column;
@@ -102,7 +95,6 @@ header nav ul li a.active {
     margin: 0 auto;
 }
 
-/* Seat Row */
 .seat-row {
     display: flex;
     align-items: center;
@@ -111,18 +103,15 @@ header nav ul li a.active {
     flex-wrap: nowrap;
 }
 
-/* Left & Right Sections */
 .seat-section {
     display: flex;
     gap: 10px;
 }
 
-/* Aisle */
 .aisle {
     width: 30px;
 }
 
-/* Seat Styling */
 .seat {
     width: 60px;
     height: 60px;
@@ -153,17 +142,14 @@ header nav ul li a.active {
     cursor: not-allowed;
 }
 
-/* Selected Seat */
 .seat.selected {
     background:  #ffc107;
 }
 
-/* Extra spacing every 5 rows */
 .seat-row:nth-child(5n) {
     margin-bottom: 30px;
 }
 
-/* Container Layout */
 .flight-container {
     display: flex;
     justify-content: space-between;
@@ -171,7 +157,6 @@ header nav ul li a.active {
     padding: 2rem;
 }
 
-/* Flight Info & Recommendation Panel Background */
 .flight-info, .recommendation-panel {
     width: 25%;
     padding: 1.5rem;
@@ -182,7 +167,6 @@ header nav ul li a.active {
     top: 10px;
 }
 
-/* Seat Selection Container */
 .seat-selection-container {
     display: flex;
     flex-direction: column;
@@ -190,7 +174,6 @@ header nav ul li a.active {
     width: 50%;
 }
 
-/* Plane Background */
 .plane-background {
     background: rgba(160, 209, 248, 0.2);
     border-radius: 60px;
@@ -200,13 +183,11 @@ header nav ul li a.active {
     text-align: center;
 }
 
-/* Seat Recommendation Panel */
 .recommendation-panel {
     width: 25%;
     text-align: left;
 }
 
-/* Preferences Section */
 .preferences {
     display: flex;
     flex-direction: column;
@@ -226,7 +207,6 @@ header nav ul li a.active {
     cursor: pointer;
 }
 
-/* Recommend Seat Button */
 #recommend-seat-btn {
     display: block;
     background: #ffcd38;
@@ -247,21 +227,19 @@ header nav ul li a.active {
 }
 
 @keyframes recommended-flash {
-    0%   { background-color: #8bc34a; } /* your .available color */
-    50%  { background-color: #ffc107; } /* your .selected color */
+    0%   { background-color: #8bc34a; }
+    50%  { background-color: #ffc107; }
     100% { background-color: #8bc34a; }
   }
   
   .seat.recommended {
     animation: recommended-flash 1s infinite; 
-    /* You could also set a border or box-shadow if you want more emphasis */
     box-shadow: 0 0 5px #ffc107;
   }
   
-  /* Modernize the recommendation panel */
 .recommendation-panel {
     width: 25%;
-    background: #fff; /* White for a clean card-like look */
+    background: #fff;
     padding: 1.5rem;
     margin-top: 2rem;
     border-radius: 8px;
@@ -270,14 +248,12 @@ header nav ul li a.active {
     top: 10px;
   }
   
-  /* Headline styling */
   .recommendation-panel h2 {
     margin-bottom: 1rem;
     font-size: 1.4rem;
     color: #1e3a8a;
   }
   
-  /* Label & select styling */
   .recommendation-panel label,
   .recommendation-panel strong {
     font-weight: 500;
@@ -295,12 +271,10 @@ header nav ul li a.active {
     outline: none;
   }
   
-  /* Preferences checkboxes container */
   .preferences {
     margin-bottom: 1rem;
   }
   
-  /* Each preference label */
   .preferences label {
     margin-bottom: 0.5rem;
     display: flex;
@@ -315,7 +289,6 @@ header nav ul li a.active {
     cursor: pointer;
   }
   
-  /* Modern button styling */
   #recommend-seat-btn {
     display: block;
     width: 100%;
@@ -334,20 +307,19 @@ header nav ul li a.active {
     background: #163172;
   }
   
-/* Error banner inside the recommendation panel */
 .error-banner {
-    display: none;                 /* Hidden by default */
-    background-color: #ff4d4f;     /* Red background */
-    color: #fff;                   /* White text */
+    display: none;
+    background-color: #ff4d4f;
+    color: #fff; 
     padding: 0.75rem 1rem;
-    margin-bottom: 1rem;           /* Space below the banner */
-    border-radius: 4px;            /* Slightly rounded corners */
-    font-weight: 500;              /* Bold text */
-    text-align: center;            /* Center the text */
+    margin-bottom: 1rem; 
+    border-radius: 4px;
+    font-weight: 500;
+    text-align: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
   .error-banner.visible {
-    display: block;               /* Show when .visible is added */
+    display: block;
   }
   

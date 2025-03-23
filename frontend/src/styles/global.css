@@ -14,7 +14,6 @@ body {
   padding-bottom: 80px;
 }
 
-/* Header & Navigation */
 header {
   background: #1e3a8a;
   padding: 1rem 0;
@@ -46,12 +45,10 @@ nav ul li a.active {
   color: #ffcd38;
 }
 
-/* Main Content */
 main {
   padding: 2rem;
 }
 
-/* Footer */
 footer {
   text-align: center;
   padding: 1rem 0;
@@ -62,7 +59,6 @@ footer {
   width: 100%;
 }
 
-/* Hero Section (Index) */
 .hero {
   text-align: center;
   padding: 4rem 2rem;
@@ -74,7 +70,7 @@ footer {
 }
 
 .hero-content {
-  background: rgba(0, 0, 0, 0.6); /* Dark semi-transparent background */
+  background: rgba(0, 0, 0, 0.6);
   padding: 2rem;
   border-radius: 10px;
   color: white;
@@ -94,7 +90,7 @@ footer {
 }
 
 .index-page {
-  background-image: url('../../vanalinn.jpg'); /* Adjust path if needed */
+  background-image: url('../../vanalinn.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -102,7 +98,6 @@ footer {
 }
 
 
-/* Button Styling */
 .btn {
   display: inline-block;
   background: #ffcd38;
@@ -118,7 +113,7 @@ footer {
   background: #ffc107;
 }
 
-/* Page Header (Flights) */
+
 .page-header {
   margin-bottom: 2rem;
   text-align: center;
@@ -129,7 +124,7 @@ footer {
   font-size: 2rem;
 }
 
-/* Search Bar */
+
 .search-bar {
   display: flex;
   justify-content: center;
@@ -160,7 +155,7 @@ footer {
   background: #163172;
 }
 
-/* Table Styles */
+
 .table-container {
   overflow-x: auto;
 }

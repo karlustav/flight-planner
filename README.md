@@ -20,7 +20,7 @@ The Flight Planner application allows users to plan and manage flights using a r
 Before running the project, ensure you have the following prerequisites installed:
 
 ### For the Backend
-- **Java Development Kit (JDK)** (version 11 or later, this project used OpenJDK 23.0.2)
+- **Java Development Kit (JDK)** (version 21)
 - **Maven** (if not installed, you can use the provided Maven Wrapper)
 
 ### For the Frontend
@@ -61,7 +61,7 @@ Open a new terminal window or tab and navigate to the frontend folder:
 cd frontend
 ```
 
-Install npm if you haven't already:
+Install project dependencies
 ```
 npm install
 ```
