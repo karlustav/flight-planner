@@ -4,7 +4,7 @@ backend/target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 frontend/node-modules
-/target-
+/target/
 
 ### STS ###
 .apt_generated
