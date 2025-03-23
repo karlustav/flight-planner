@@ -50,8 +50,14 @@ cd backend
 ```
 
 Run the backend service using the Maven Wrapper:
+
+On Linux/macOS
 ```
 ./mvnw spring-boot:run
+```
+On Windows
+```
+mvnw.cmd spring-boot:run
 ```
 The backend server will start and listen on http://localhost:8080.
 
